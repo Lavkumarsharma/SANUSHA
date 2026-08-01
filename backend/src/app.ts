@@ -898,10 +898,15 @@ app.post('/api/coupons/validate', async (req: any, res: any) => {
   }
 });
 
-app.get('/api/health', (req: any, res: any) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+// Health check routes for Render & Vercel
+app.get(['/health', '/api/health'], (req: any, res: any) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 SANUSHA Enterprise REST API Server running on http://localhost:${PORT}`);
+app.get('/', (req: any, res: any) => {
+  res.status(200).json({ name: 'SANUSHA API Server', status: 'online', version: '1.0.0' });
+});
+
+app.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`🚀 SANUSHA Enterprise REST API Server running on port ${PORT}`);
 });
