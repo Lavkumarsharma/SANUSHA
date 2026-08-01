@@ -125,6 +125,19 @@ export default function StorefrontHomePage() {
   const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedHero = localStorage.getItem('sanusha_cms_hero_cache');
+        if (cachedHero) {
+          const parsed = JSON.parse(cachedHero);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const activeOnly = parsed.filter((s: any) => s.active !== false);
+            if (activeOnly.length > 0) setHeroSlides(activeOnly);
+          }
+        }
+      } catch (e) {}
+    }
+
     Promise.all([
       fetchApi('/products').catch(() => PRODUCTS_DATA),
       fetchApi('/categories').catch(() => []),
@@ -137,7 +150,12 @@ export default function StorefrontHomePage() {
         if (secs && secs.length > 0) setSections(secs);
         if (hero && Array.isArray(hero) && hero.length > 0) {
           const activeSlides = hero.filter((s: any) => s.active !== false);
-          if (activeSlides.length > 0) setHeroSlides(activeSlides);
+          if (activeSlides.length > 0) {
+            setHeroSlides(activeSlides);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(activeSlides));
+            }
+          }
         }
       })
       .finally(() => setLoading(false));
