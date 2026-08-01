@@ -89,31 +89,31 @@ async function seedCleanCMSSections() {
             key: 'hero',
             title: 'TIMELESS ELEGANCE & MODERN PURITY',
             subtitle: 'Hand-crafted luxury linen, refined silhouettes, and conscious fashion.',
-            bannerUrl: '/images/hero_banner.jpg',
-            buttonText: 'SHOP THE COLLECTION',
-            buttonLink: '/shop',
+            image: '/images/hero_banner.jpg',
+            ctaText: 'SHOP THE COLLECTION',
+            ctaLink: '/shop',
             order: 1,
-            visible: true,
+            isVisible: true,
           },
           {
             key: 'categories',
             title: 'Curated Fashion Categories',
             subtitle: 'Explore our hand-selected women, men, tops, and bottoms collections',
-            bannerUrl: '/images/cat_women.jpg',
-            buttonText: 'EXPLORE ALL',
-            buttonLink: '/shop',
+            image: '/images/cat_women.jpg',
+            ctaText: 'EXPLORE ALL',
+            ctaLink: '/shop',
             order: 2,
-            visible: true,
+            isVisible: true,
           },
           {
             key: 'new_arrivals',
             title: 'New Arrivals Spotlight',
             subtitle: 'Fresh seasonal styles crafted with European flax linen',
-            bannerUrl: '/images/pdp_linen_main.jpg',
-            buttonText: 'VIEW ALL NEW',
-            buttonLink: '/shop',
+            image: '/images/pdp_linen_main.jpg',
+            ctaText: 'VIEW ALL NEW',
+            ctaLink: '/shop',
             order: 3,
-            visible: true,
+            isVisible: true,
           },
         ],
       });
@@ -294,7 +294,7 @@ app.get('/api/products', async (req: any, res: any) => {
     });
 
     const mappedProducts = products.map((p) => {
-      const distinctImage = resolveDistinctProductImage(p.name, p.images?.[0]);
+      const distinctImage = resolveDistinctProductImage(p.name, (p as any).images?.[0] || p.image);
       return {
         ...p,
         image: distinctImage,
@@ -315,7 +315,7 @@ app.get('/api/products/:id', async (req: any, res: any) => {
       include: { category: true, collection: true, variants: true },
     });
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    const distinctImage = resolveDistinctProductImage(product.name, product.images?.[0]);
+    const distinctImage = resolveDistinctProductImage(product.name, (product as any).images?.[0] || product.image);
     res.json({
       ...product,
       image: distinctImage,
