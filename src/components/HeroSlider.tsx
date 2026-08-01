@@ -1,0 +1,125 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+
+interface Slide {
+  id: number;
+  tagline: string;
+  titleLine1: string;
+  titleLine2: string;
+  subtitle: string;
+  ctaText: string;
+  ctaLink: string;
+  image: string;
+}
+
+const SLIDES: Slide[] = [
+  {
+    id: 1,
+    tagline: 'NEW COLLECTION',
+    titleLine1: 'EFFORTLESSLY',
+    titleLine2: 'ELEGANT',
+    subtitle: 'Timeless styles for every you. Designed to inspire confidence.',
+    ctaText: 'SHOP NOW',
+    ctaLink: '#products',
+    image: '/images/hero_banner.jpg',
+  },
+  {
+    id: 2,
+    tagline: 'SUMMER ESSENTIALS',
+    titleLine1: 'MODERN',
+    titleLine2: 'MINIMALISM',
+    subtitle: 'Crafted with premium organic fabrics for ultimate comfort.',
+    ctaText: 'EXPLORE EDIT',
+    ctaLink: '#collections',
+    image: '/images/summer_banner.jpg',
+  },
+];
+
+export const HeroSlider: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const slide = SLIDES[currentSlide];
+
+  return (
+    <section className="relative w-full aspect-[16/9] min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden">
+      {/* Background Slide Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-top sm:bg-center transition-all duration-700 ease-in-out"
+        style={{ backgroundImage: `url(${slide.image})`, imageRendering: 'high-quality' }}
+      >
+        {/* Soft overlay gradient for perfect text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent lg:via-white/30" />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative max-w-7xl mx-auto h-full px-6 sm:px-12 flex items-center">
+        <div className="max-w-xl space-y-4 animate-in fade-in slide-in-from-left duration-500">
+          <span className="inline-block text-xs font-bold tracking-[0.25em] text-[#6C307D] uppercase">
+            {slide.tagline}
+          </span>
+
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-gray-900 leading-[1.05] tracking-tight">
+            {slide.titleLine1} <br />
+            <span className="text-[#6C307D] font-normal italic">{slide.titleLine2}</span>
+          </h1>
+
+          <p className="text-sm sm:text-base text-gray-700 max-w-md font-medium leading-relaxed">
+            {slide.subtitle}
+          </p>
+
+          <div className="pt-2">
+            <a
+              href={slide.ctaLink}
+              className="inline-flex items-center gap-3 bg-[#6C307D] hover:bg-[#522061] text-white text-xs font-bold tracking-widest uppercase px-7 py-3.5 rounded-sm shadow-md transition-all hover:gap-4 hover:shadow-lg"
+            >
+              {slide.ctaText}
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Slide Navigation Controls */}
+      <button
+        onClick={() => setCurrentSlide((prev) => (prev === 0 ? SLIDES.length - 1 : prev - 1))}
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-gray-800 flex items-center justify-center backdrop-blur-sm shadow-md transition-all hover:scale-105"
+        aria-label="Previous Slide"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      <button
+        onClick={() => setCurrentSlide((prev) => (prev + 1) % SLIDES.length)}
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-gray-800 flex items-center justify-center backdrop-blur-sm shadow-md transition-all hover:scale-105"
+        aria-label="Next Slide"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Pagination Dots */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        {SLIDES.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentSlide(idx)}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              idx === currentSlide
+                ? 'bg-[#6C307D] w-6'
+                : 'bg-gray-400/60 hover:bg-gray-600'
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};

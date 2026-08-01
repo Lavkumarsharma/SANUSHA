@@ -1,0 +1,203 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("CUSTOMER") // SUPER_ADMIN, ADMIN, MANAGER, EDITOR, CUSTOMER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  bannerImage String?
+  icon        String?
+  isMegaMenu  Boolean    @default(false)
+  parentId    String?
+  parent      Category?  @relation("ParentCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("ParentCategory")
+  products    Product[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Collection {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  subtitle    String?
+  image       String?
+  isFeatured  Boolean   @default(false)
+  type        String    @default("SEASONAL") // SEASONAL, LUXURY, LIMITED, TRENDING
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id             String           @id @default(uuid())
+  name           String
+  slug           String           @unique
+  sku            String           @unique
+  price          Float
+  originalPrice  Float?
+  discountBadge  String?
+  status         String           @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  badge          String?
+  gender         String           @default("Unisex")
+  category       Category?        @relation(fields: [categoryId], references: [id])
+  categoryId     String?
+  collection     Collection?      @relation(fields: [collectionId], references: [id])
+  collectionId   String?
+  material       String           @default("Cotton")
+  pattern        String           @default("Solid")
+  description    String
+  detailsBullets String?
+  image          String
+  galleryImages  String           @default("[]") // JSON string array
+  stock          Int              @default(50)
+  views          Int              @default(0)
+  variants       ProductVariant[]
+  orderItems     OrderItem[]
+  stockLogs      StockLog[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model ProductVariant {
+  id         String   @id @default(uuid())
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  size       String
+  color      String
+  sku        String   @unique
+  stock      Int      @default(20)
+  priceDelta Float    @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+  user            User?       @relation(fields: [userId], references: [id])
+  userId          String?
+  customerName    String
+  email           String
+  phone           String
+  shippingAddress String
+  subtotal        Float
+  discount        Float       @default(0)
+  shippingFee     Float       @default(0)
+  total           Float
+  status          String      @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  paymentStatus   String      @default("PAID")
+  paymentMethod   String      @default("COD") // COD, UPI, CARD, NETBANKING
+  trackingNumber  String?
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  product     Product? @relation(fields: [productId], references: [id])
+  productId   String?
+  productName String
+  quantity    Int
+  price       Float
+  size        String   @default("M")
+  color       String   @default("Default")
+}
+
+model StockLog {
+  id           String   @id @default(uuid())
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    String
+  changeAmount Int
+  reason       String   @default("MANUAL_UPDATE")
+  createdAt    DateTime @default(now())
+}
+
+model CmsSection {
+  id           String   @id @default(uuid())
+  key          String   @unique
+  title        String
+  subtitle     String?
+  image        String?
+  ctaText      String?
+  ctaLink      String?
+  order        Int      @default(0)
+  isVisible    Boolean  @default(true)
+  contentJson  String   @default("{}")
+  updatedAt    DateTime @updatedAt
+}
+
+model ThemeSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model MediaItem {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  altText      String?
+  createdAt    DateTime @default(now())
+}
+
+model StoreSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  content   String
+  excerpt   String?
+  author    String   @default("SANUSHA Editorial")
+  image     String?
+  status    String   @default("PUBLISHED") // DRAFT, PUBLISHED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Coupon {
+  id             String    @id @default(uuid())
+  code           String    @unique
+  discountType   String    @default("PERCENTAGE") // PERCENTAGE, FIXED
+  discountValue  Float
+  minOrderAmount Float     @default(0)
+  maxDiscount    Float?
+  description    String?
+  usageLimit     Int       @default(1000)
+  usageCount     Int       @default(0)
+  active         Boolean   @default(true)
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}

@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-purple: #6C307D;
+    --brand-purple-dark: #522061;
+    --brand-purple-hover: #5A276B;
+    --brand-bg: #F5F3EF;
+    --brand-dark: #1F1F1F;
+    --brand-gray: #767676;
+    --brand-light-gray: #F7F7F7;
+    --brand-border: #E8E5DF;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #FFFFFF;
+    color: #1F1F1F;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: 0.02em;
+  }
+
+  .font-brand-logo {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.25em;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #6C307D;
+  border-radius: 3px;
+}

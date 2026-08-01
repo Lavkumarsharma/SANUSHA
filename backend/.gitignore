@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Production build output
+dist/
+build/
+
+# Environment files
+.env
+
+# Database (keep dev.db out of version control if desired, or allow if seeded)
+prisma/*.db-journal
+
+# Uploaded Media / Temporary Files
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
