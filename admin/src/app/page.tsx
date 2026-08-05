@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -12,16 +12,32 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [headerConfig, setHeaderConfig] = useState({
-    brandName: 'SANUSHA',
-    iconUrl: '',
-    logoUrl: '',
+  const [headerConfig, setHeaderConfig] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedHdr = localStorage.getItem('sanusha_cms_header_cache');
+        if (cachedHdr) {
+          const parsed = JSON.parse(cachedHdr);
+          if (parsed && parsed.brandName) return parsed;
+        }
+      } catch (e) {}
+    }
+    return {
+      brandName: 'SANUSHA',
+      iconUrl: '',
+      logoUrl: '',
+    };
   });
 
   useEffect(() => {
     fetchApi('/cms/header')
       .then((data) => {
-        if (data && data.brandName) setHeaderConfig(data);
+        if (data && data.brandName) {
+          setHeaderConfig(data);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+          }
+        }
       })
       .catch(() => {});
   }, []);
@@ -64,12 +80,12 @@ export default function AdminLoginPage() {
       {/* Top Header */}
       <header className="relative z-10 max-w-7xl w-full mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          {headerConfig.iconUrl && (
-            <img src={headerConfig.iconUrl} alt="Icon" className="h-8 w-auto object-contain" />
-          )}
+          {getImageUrl(headerConfig.iconUrl) ? (
+            <img src={getImageUrl(headerConfig.iconUrl)} alt="Icon" className="h-8 w-auto object-contain" />
+          ) : null}
 
-          {headerConfig.logoUrl ? (
-            <img src={headerConfig.logoUrl} alt={headerConfig.brandName} className="h-8 w-auto object-contain" />
+          {getImageUrl(headerConfig.logoUrl) ? (
+            <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-8 w-auto object-contain" />
           ) : (
             <span className="font-serif text-2xl font-bold tracking-[0.2em] text-slate-900">
               {headerConfig.brandName}
@@ -84,14 +100,14 @@ export default function AdminLoginPage() {
           
           {/* Brand Header & Logo Display */}
           <div className="text-center space-y-2">
-            {headerConfig.logoUrl || headerConfig.iconUrl ? (
+            {getImageUrl(headerConfig.logoUrl) || getImageUrl(headerConfig.iconUrl) ? (
               <div className="flex justify-center items-center gap-2 py-2">
-                {headerConfig.iconUrl && (
-                  <img src={headerConfig.iconUrl} alt="Icon" className="h-12 w-auto object-contain" />
-                )}
-                {headerConfig.logoUrl && (
-                  <img src={headerConfig.logoUrl} alt={headerConfig.brandName} className="h-12 w-auto object-contain" />
-                )}
+                {getImageUrl(headerConfig.iconUrl) ? (
+                  <img src={getImageUrl(headerConfig.iconUrl)} alt="Icon" className="h-12 w-auto object-contain" />
+                ) : null}
+                {getImageUrl(headerConfig.logoUrl) ? (
+                  <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-12 w-auto object-contain" />
+                ) : null}
               </div>
             ) : (
               <div className="w-14 h-14 rounded-2xl bg-[#6C307D] text-white font-bold text-2xl flex items-center justify-center mx-auto shadow-lg shadow-purple-900/20">
@@ -99,7 +115,7 @@ export default function AdminLoginPage() {
               </div>
             )}
 
-            {!headerConfig.logoUrl && (
+            {!getImageUrl(headerConfig.logoUrl) && (
               <h1 className="text-2xl font-bold tracking-widest text-slate-900 uppercase font-serif">
                 {headerConfig.brandName}
               </h1>

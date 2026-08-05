@@ -17,20 +17,36 @@ import {
   Ticket,
   LogOut,
 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
-  const [headerConfig, setHeaderConfig] = useState({
-    brandName: 'SANUSHA',
-    iconUrl: '',
-    logoUrl: '',
+  const [headerConfig, setHeaderConfig] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedHdr = localStorage.getItem('sanusha_cms_header_cache');
+        if (cachedHdr) {
+          const parsed = JSON.parse(cachedHdr);
+          if (parsed && parsed.brandName) return parsed;
+        }
+      } catch (e) {}
+    }
+    return {
+      brandName: 'SANUSHA',
+      iconUrl: '',
+      logoUrl: '',
+    };
   });
 
   useEffect(() => {
     fetchApi('/cms/header')
       .then((data) => {
-        if (data && data.brandName) setHeaderConfig(data);
+        if (data && data.brandName) {
+          setHeaderConfig(data);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+          }
+        }
       })
       .catch(() => {});
   }, []);
@@ -56,13 +72,13 @@ export const Sidebar: React.FC = () => {
       <div className="space-y-6">
         {/* Brand Header with Live Logo Sync (Purple 'S' box removed) */}
         <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-100">
-          {headerConfig.iconUrl && (
-            <img src={headerConfig.iconUrl} alt="Icon" className="w-7 h-7 object-contain rounded shrink-0" />
-          )}
+          {getImageUrl(headerConfig.iconUrl) ? (
+            <img src={getImageUrl(headerConfig.iconUrl)} alt="Icon" className="w-7 h-7 object-contain rounded shrink-0" />
+          ) : null}
 
           <div className="min-w-0 flex-1">
-            {headerConfig.logoUrl ? (
-              <img src={headerConfig.logoUrl} alt={headerConfig.brandName} className="h-7 w-auto object-contain" />
+            {getImageUrl(headerConfig.logoUrl) ? (
+              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-7 w-auto object-contain" />
             ) : (
               <h1 className="font-bold text-slate-900 tracking-[0.2em] text-base truncate font-serif">
                 {headerConfig.brandName}
