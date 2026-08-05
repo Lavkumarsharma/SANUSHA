@@ -480,17 +480,17 @@ export default function CustomerAccountPage() {
                             <div className="p-4 divide-y divide-gray-100 space-y-3">
                               {(order.items || []).map((it: any, i: number) => (
                                 <div key={it.id || i} className="flex items-center justify-between gap-4 pt-2 first:pt-0 text-xs">
-                                  <div className="flex items-center gap-3">
+                                  <Link href={`/product/${it.productId || it.id}`} className="flex items-center gap-3 group">
                                     <img
                                       src={getProductImage(it)}
                                       alt={it.productName || 'SANUSHA Apparel Item'}
-                                      className="w-12 h-14 object-cover rounded border shrink-0 bg-white"
+                                      className="w-12 h-14 object-cover rounded border shrink-0 bg-white group-hover:scale-105 transition-transform"
                                     />
                                     <div>
-                                      <h4 className="font-bold text-gray-900">{it.productName || 'SANUSHA Apparel Item'}</h4>
+                                      <h4 className="font-bold text-gray-900 group-hover:text-[#6C307D] transition-colors">{it.productName || 'SANUSHA Apparel Item'}</h4>
                                       <p className="text-gray-500 text-[11px]">Size: {it.size || 'M'} | Qty: {it.quantity || 1}</p>
                                     </div>
-                                  </div>
+                                  </Link>
                                   <span className="font-serif font-bold text-gray-900 text-sm">
                                     ₹{(it.price * (it.quantity || 1)).toLocaleString()}
                                   </span>

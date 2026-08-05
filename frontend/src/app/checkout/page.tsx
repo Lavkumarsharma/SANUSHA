@@ -653,14 +653,18 @@ export default function StorefrontCheckoutPage() {
                       const pSize = (item as any).size || (item as any).selectedSize || 'M';
 
                       return (
-                        <div key={item.id || idx} className="flex items-center gap-3 bg-white p-2.5 rounded border border-gray-200 text-xs">
-                          <img src={pImg} alt={pName} className="w-12 h-14 object-cover rounded shrink-0 border" />
+                        <Link
+                          key={item.id || idx}
+                          href={`/product/${item.product?.id || (item as any).productId || item.id}`}
+                          className="flex items-center gap-3 bg-white p-2.5 rounded border border-gray-200 text-xs group hover:border-[#6C307D] transition-colors"
+                        >
+                          <img src={pImg} alt={pName} className="w-12 h-14 object-cover rounded shrink-0 border group-hover:scale-105 transition-transform" />
                           <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-gray-900 truncate">{pName}</h4>
+                            <h4 className="font-bold text-gray-900 group-hover:text-[#6C307D] transition-colors truncate">{pName}</h4>
                             <p className="text-[10px] text-gray-500">Size: {pSize} | Qty: {pQty}</p>
                             <p className="font-serif font-bold text-gray-900 mt-0.5">₹{(pPrice * pQty).toLocaleString()}</p>
                           </div>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>

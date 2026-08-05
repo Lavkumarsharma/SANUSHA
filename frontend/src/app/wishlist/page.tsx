@@ -133,14 +133,19 @@ export default function CustomerWishlistPage() {
                   className="group bg-white border border-[#EBE7DF] rounded-xs overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow"
                 >
                   <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
+                    <Link href={`/product/${product.id}`} className="block w-full h-full">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </Link>
                     <button
-                      onClick={() => toggleWishlist(product.id)}
-                      className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 shadow-sm flex items-center justify-center text-red-600 hover:scale-110 transition-transform"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist(product.id);
+                      }}
+                      className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 shadow-sm flex items-center justify-center text-red-600 hover:scale-110 transition-transform z-10"
                       title="Remove from Wishlist"
                     >
                       <Heart className="w-4 h-4 fill-red-600 text-red-600" />
@@ -148,18 +153,20 @@ export default function CustomerWishlistPage() {
                   </div>
 
                   <div className="p-4 space-y-2">
-                    <h4 className="font-bold text-gray-900 text-xs sm:text-sm line-clamp-1">
-                      {product.name}
-                    </h4>
+                    <Link href={`/product/${product.id}`} className="block group/title">
+                      <h4 className="font-bold text-gray-900 text-xs sm:text-sm line-clamp-1 group-hover/title:text-[#6C307D] transition-colors">
+                        {product.name}
+                      </h4>
 
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-[#6C307D]">₹{product.price.toLocaleString('en-IN')}</span>
-                      {product.originalPrice && (
-                        <span className="text-gray-400 line-through text-[11px]">
-                          ₹{product.originalPrice.toLocaleString('en-IN')}
-                        </span>
-                      )}
-                    </div>
+                      <div className="flex items-center justify-between text-xs font-bold mt-1">
+                        <span className="text-[#6C307D]">₹{product.price.toLocaleString('en-IN')}</span>
+                        {product.originalPrice && (
+                          <span className="text-gray-400 line-through text-[11px]">
+                            ₹{product.originalPrice.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
 
                     <div className="pt-2 flex gap-2">
                       <button

@@ -359,44 +359,53 @@ export default function StorefrontHomePage() {
               const prodImg = getProductImage(product);
 
               return (
-                <div key={product.id} className="group relative flex flex-col justify-between">
-                  <div className="relative aspect-[3/4] bg-gray-100 rounded-xs overflow-hidden mb-3 border border-[#EBE7DF]">
-                    <img
-                      src={prodImg}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                <div key={product.id} className="group relative flex flex-col justify-between bg-white border border-[#EBE7DF] rounded-xs overflow-hidden shadow-2xs hover:shadow-md transition-shadow">
+                  <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
+                    <Link href={`/product/${product.id}`} className="block w-full h-full">
+                      <img
+                        src={prodImg}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </Link>
 
                     <button
-                      onClick={() => toggleWishlist(product.id)}
-                      className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-xs transition-colors ${
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist(product.id);
+                      }}
+                      className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-xs transition-colors z-10 ${
                         isWishlisted ? 'bg-red-50 text-red-600' : 'bg-white/80 text-gray-700 hover:bg-white'
                       }`}
+                      title="Wishlist"
                     >
                       <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
                     </button>
 
                     <button
-                      onClick={() => addToCart(product, 'M', 1)}
-                      className="absolute bottom-3 left-3 right-3 bg-slate-900 hover:bg-[#6C307D] text-white text-xs font-bold uppercase py-2.5 rounded-xs opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product, 'M', 1);
+                      }}
+                      className="absolute bottom-3 left-3 right-3 bg-slate-900 hover:bg-[#6C307D] text-white text-xs font-bold uppercase py-2.5 rounded-xs opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2 z-10"
                     >
                       <ShoppingBag className="w-4 h-4" />
                       <span>Add to Bag</span>
                     </button>
                   </div>
 
-                  <div>
+                  <div className="p-3">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
                       {product.gender} • {product.category?.name || product.category || 'Apparel'}
                     </span>
-                    <Link href={`/product/${product.id}`}>
-                      <h3 className="text-xs font-bold text-gray-900 hover:text-[#6C307D] transition-colors truncate">
+                    <Link href={`/product/${product.id}`} className="block group/title">
+                      <h3 className="text-xs font-bold text-gray-900 group-hover/title:text-[#6C307D] transition-colors truncate mt-0.5">
                         {product.name}
                       </h3>
+                      <span className="text-xs font-serif font-bold text-gray-900 mt-1 block">
+                        ₹{product.price?.toLocaleString()}
+                      </span>
                     </Link>
-                    <span className="text-xs font-serif font-bold text-gray-900 mt-1 block">
-                      ₹{product.price?.toLocaleString()}
-                    </span>
                   </div>
                 </div>
               );

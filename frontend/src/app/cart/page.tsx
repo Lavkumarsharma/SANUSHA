@@ -197,19 +197,19 @@ export default function ShoppingCartPage() {
                         return (
                           <tr key={item.id} className="hover:bg-[#FAF8F5]/50 transition-colors">
                             <td className="p-4">
-                              <div className="flex items-center gap-4">
+                              <Link href={`/product/${item.product?.id || (item as any).productId || item.id}`} className="flex items-center gap-4 group">
                                 <img
                                   src={pImg}
                                   alt={pName}
-                                  className="w-14 h-14 object-cover rounded-xs border border-[#EBE7DF]"
+                                  className="w-14 h-14 object-cover rounded-xs border border-[#EBE7DF] group-hover:scale-105 transition-transform shrink-0"
                                 />
                                 <div>
-                                  <h4 className="font-bold text-gray-900">{pName}</h4>
+                                  <h4 className="font-bold text-gray-900 group-hover:text-[#6C307D] transition-colors">{pName}</h4>
                                   <span className="text-[10px] text-gray-500 font-medium block">
                                     Size: {item.size || 'M'} • Color: {item.color || 'Default'}
                                   </span>
                                 </div>
-                              </div>
+                              </Link>
                             </td>
                             <td className="p-4 font-bold text-gray-900">₹{price.toLocaleString()}</td>
                             <td className="p-4">
