@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { Search, Bell, User, ExternalLink } from 'lucide-react';
+import { Search, Bell, User } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -25,17 +25,6 @@ export const Header: React.FC = () => {
 
       {/* Right Controls */}
       <div className="flex items-center gap-4 text-xs">
-        {/* Customer Site Preview Link */}
-        <a
-          href="http://localhost:3000"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:inline-flex items-center gap-1.5 bg-[#FAF6F0] text-[#6F472B] hover:bg-[#F3EBE0] border border-[#E8D9C8] px-3 py-1.5 rounded-md font-bold transition-colors"
-        >
-          <span>Live Storefront</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
-
         {/* Notifications */}
         <button
           className="relative text-slate-500 hover:text-slate-900 p-1.5 rounded-md hover:bg-slate-100 transition-colors"
