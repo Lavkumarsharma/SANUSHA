@@ -8,7 +8,7 @@ import { AnnouncementBar } from '@/components/AnnouncementBar';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Toast } from '@/components/Toast';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 import { useStore } from '@/store/useStore';
 
 export default function CustomerRegisterPage() {
@@ -98,11 +98,11 @@ export default function CustomerRegisterPage() {
           {/* Dynamic Logo Header */}
           <div className="text-center space-y-2">
             <Link href="/" className="inline-flex justify-center items-center gap-2">
-              {headerConfig.iconUrl && (
-                <img src={headerConfig.iconUrl} alt="Icon" className="h-10 w-auto object-contain" />
-              )}
-              {headerConfig.logoUrl ? (
-                <img src={headerConfig.logoUrl} alt={headerConfig.brandName} className="h-10 w-auto object-contain" />
+              {getImageUrl(headerConfig.iconUrl) ? (
+                <img src={getImageUrl(headerConfig.iconUrl)} alt="Icon" className="h-10 w-auto object-contain" />
+              ) : null}
+              {getImageUrl(headerConfig.logoUrl) ? (
+                <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-10 w-auto object-contain" />
               ) : (
                 <h1 className="text-2xl font-bold tracking-widest text-slate-900 uppercase font-serif">
                   {headerConfig.brandName}

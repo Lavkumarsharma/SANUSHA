@@ -14,7 +14,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useStore, PRODUCTS_DATA as FALLBACK_PRODUCTS, getProductImage } from '@/store/useStore';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -230,7 +230,7 @@ export const Navbar: React.FC = () => {
                             className="relative group/card block overflow-hidden rounded-xs aspect-[4/5] bg-gray-100 shadow-xs"
                           >
                             <img
-                              src={headerConfig.megaMenuBanner?.imageUrl || '/images/cat_women.jpg'}
+                              src={getImageUrl(headerConfig.megaMenuBanner?.imageUrl) || '/images/cat_women.jpg'}
                               alt={headerConfig.megaMenuBanner?.title || 'New Season'}
                               className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
                             />
@@ -266,12 +266,12 @@ export const Navbar: React.FC = () => {
         {/* 2. CENTER SECTION: PROPORTIONATE SLEEK BRAND LOGO & NAME */}
         <div className="flex-1 flex justify-center items-center shrink-0">
           <Link href="/" className="flex items-center justify-center gap-2 group py-0.5">
-            {headerConfig.iconUrl && (
-              <img src={headerConfig.iconUrl} alt="Brand Icon" className="h-7 sm:h-8 w-auto object-contain" />
-            )}
+            {getImageUrl(headerConfig.iconUrl) ? (
+              <img src={getImageUrl(headerConfig.iconUrl)} alt="Brand Icon" className="h-7 sm:h-8 w-auto object-contain" />
+            ) : null}
 
-            {headerConfig.logoUrl ? (
-              <img src={headerConfig.logoUrl} alt={headerConfig.brandName} className="h-7 sm:h-8 w-auto object-contain" />
+            {getImageUrl(headerConfig.logoUrl) ? (
+              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-7 sm:h-8 w-auto object-contain" />
             ) : (
               <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.22em] text-gray-900 group-hover:text-[#6C307D] transition-colors">
                 {headerConfig.brandName}

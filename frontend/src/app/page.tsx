@@ -15,7 +15,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Toast } from '@/components/Toast';
 import { useStore, PRODUCTS_DATA, getProductImage } from '@/store/useStore';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 function renderStyledHeroTitle(title: string) {
   if (!title) return null;
@@ -198,7 +198,7 @@ export default function StorefrontHomePage() {
               >
                 {/* 100% Full Cover Image filling exact hero dimensions in original high quality */}
                 <img
-                  src={slide.bannerUrl || '/images/hero_banner.jpg'}
+                  src={getImageUrl(slide.bannerUrl) || '/images/hero_banner.jpg'}
                   alt={slide.title || 'SANUSHA Hero Banner'}
                   className="w-full h-full object-cover object-top sm:object-center transition-transform duration-700"
                   style={{ imageRendering: 'auto' as any }}
@@ -315,7 +315,7 @@ export default function StorefrontHomePage() {
                 className="group relative aspect-[3/4] rounded-xs overflow-hidden bg-gray-100 border border-[#EBE7DF]"
               >
                 <img
-                  src={cat.image || '/images/cat_women.jpg'}
+                  src={getImageUrl(cat.image) || '/images/cat_women.jpg'}
                   alt={cat.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

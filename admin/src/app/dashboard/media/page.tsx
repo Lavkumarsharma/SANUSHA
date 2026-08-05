@@ -10,7 +10,7 @@ import {
   Image as ImageIcon,
   FileText,
 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, API_BASE_URL, getImageUrl } from '@/lib/api';
 
 export default function MediaManagerPage() {
   const [mediaItems, setMediaItems] = useState<any[]>([]);
@@ -40,7 +40,7 @@ export default function MediaManagerPage() {
       const formData = new FormData();
       formData.append('file', files[i]);
       try {
-        await fetch('http://localhost:5000/api/media/upload', {
+        await fetch(`${API_BASE_URL}/media/upload`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('sanusha_token') || ''}`,
@@ -140,7 +140,7 @@ export default function MediaManagerPage() {
               >
                 <div className="relative aspect-[4/3] w-full bg-slate-200 overflow-hidden">
                   <img
-                    src={item.url}
+                    src={getImageUrl(item.url)}
                     alt={item.altText || item.filename}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

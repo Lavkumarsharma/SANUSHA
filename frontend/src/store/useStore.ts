@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export interface Product {
   id: string;
@@ -192,10 +192,13 @@ export const PRODUCTS_DATA: Product[] = [
 
 export const getProductImage = (p: any): string => {
   if (!p) return '/images/pdp_linen_main.jpg';
-  if (typeof p.productImage === 'string' && p.productImage.trim()) return p.productImage;
-  if (typeof p.image === 'string' && p.image.trim()) return p.image;
-  if (Array.isArray(p.images) && p.images[0]) return p.images[0];
-  if (Array.isArray(p.galleryImages) && p.galleryImages[0]) return p.galleryImages[0];
+  let raw = '';
+  if (typeof p.productImage === 'string' && p.productImage.trim()) raw = p.productImage;
+  else if (typeof p.image === 'string' && p.image.trim()) raw = p.image;
+  else if (Array.isArray(p.images) && p.images[0]) raw = p.images[0];
+  else if (Array.isArray(p.galleryImages) && p.galleryImages[0]) raw = p.galleryImages[0];
+
+  if (raw) return getImageUrl(raw);
   
   const name = (p.productName || p.name || '').toLowerCase();
   if (name.includes('parachute') || name.includes('pants') || name.includes('cargo')) return '/images/prod_cargo_pants.jpg';

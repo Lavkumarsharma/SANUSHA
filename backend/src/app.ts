@@ -19,10 +19,15 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'sanusha_jwt_secret_2026';
 
-// Ensure uploads directory exists
+// Ensure uploads & images directories exist
 const uploadsDir = path.join(__dirname, '../public/uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const imagesDir = path.join(__dirname, '../public/images');
+if (!fs.existsSync(imagesDir)) {
+  fs.mkdirSync(imagesDir, { recursive: true });
 }
 
 // Multer Storage Configuration
@@ -43,6 +48,8 @@ app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(uploadsDir));
+app.use('/images', express.static(imagesDir));
+
 
 // Auth Middleware (Soft authentication allowing seamless updates)
 const authenticate = (req: any, res: any, next: any) => {
@@ -201,6 +208,7 @@ app.get('/api/media', async (req: any, res: any) => {
 
 app.post('/api/media/upload', upload.single('file'), async (req: any, res: any) => {
   try {
+    const hostUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
     if (!req.file) {
       const { imageBase64, filename, altText } = req.body;
       if (imageBase64) {
@@ -213,7 +221,7 @@ app.post('/api/media/upload', upload.single('file'), async (req: any, res: any) 
         const buffer = Buffer.from(matches[2], 'base64');
         fs.writeFileSync(path.join(uploadsDir, fname), buffer);
 
-        const mediaUrl = `http://localhost:5000/uploads/${fname}`;
+        const mediaUrl = `${hostUrl}/uploads/${fname}`;
         const newMedia = await prisma.mediaItem.create({
           data: {
             filename: fname,
@@ -229,7 +237,7 @@ app.post('/api/media/upload', upload.single('file'), async (req: any, res: any) 
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const mediaUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    const mediaUrl = `${hostUrl}/uploads/${req.file.filename}`;
     const mediaItem = await prisma.mediaItem.create({
       data: {
         filename: req.file.filename,

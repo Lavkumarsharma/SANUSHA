@@ -27,7 +27,7 @@ import {
   Tv,
   Monitor,
 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, API_BASE_URL, getImageUrl } from '@/lib/api';
 
 // ----------------------------------------------------
 // SCROLLABLE & STICKY FOOTER CROPPER MODAL
@@ -619,7 +619,7 @@ export default function CMSPageBuilderPage() {
 
     try {
       setUploading(field);
-      const res = await fetch('http://localhost:5000/api/media/upload', {
+      const res = await fetch(`${API_BASE_URL}/media/upload`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('sanusha_token') || ''}`,
@@ -659,7 +659,7 @@ export default function CMSPageBuilderPage() {
   ) => {
     try {
       setUploading(field);
-      const res = await fetch('http://localhost:5000/api/media/upload', {
+      const res = await fetch(`${API_BASE_URL}/media/upload`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1007,7 +1007,7 @@ export default function CMSPageBuilderPage() {
                 <div className="md:col-span-5 space-y-2">
                   <label className="block font-bold text-slate-800">Slide Background Banner Image</label>
                   <div className="relative aspect-[16/9] bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shadow-2xs group">
-                    <img src={slide.bannerUrl} alt="Slide Preview" className="w-full h-full object-cover" />
+                    <img src={getImageUrl(slide.bannerUrl)} alt="Slide Preview" className="w-full h-full object-cover" />
                     
                     <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 text-white">
                       <label className="cursor-pointer bg-[#6C307D] hover:bg-[#522061] text-white font-bold text-[10px] px-3 py-2 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
@@ -1128,10 +1128,10 @@ export default function CMSPageBuilderPage() {
           <div className="space-y-1.5">
             <label className="block font-bold text-slate-800">1. Brand Icon / Symbol (Free Crop)</label>
             <div className="flex items-center gap-3 bg-white p-3 border border-slate-300 rounded-lg">
-              {headerConfig.iconUrl ? (
+              {getImageUrl(headerConfig.iconUrl) ? (
                 <div className="relative group shrink-0">
                   <img
-                    src={headerConfig.iconUrl}
+                    src={getImageUrl(headerConfig.iconUrl)}
                     alt="Icon"
                     className="h-10 w-10 object-contain bg-slate-100 p-1 rounded border border-slate-200"
                   />
@@ -1161,10 +1161,10 @@ export default function CMSPageBuilderPage() {
           <div className="space-y-1.5">
             <label className="block font-bold text-slate-800">2. Brand Logo Image (Free Crop & Trim)</label>
             <div className="flex items-center gap-3 bg-white p-3 border border-slate-300 rounded-lg">
-              {headerConfig.logoUrl ? (
+              {getImageUrl(headerConfig.logoUrl) ? (
                 <div className="relative group shrink-0">
                   <img
-                    src={headerConfig.logoUrl}
+                    src={getImageUrl(headerConfig.logoUrl)}
                     alt="Logo"
                     className="h-10 w-24 object-contain bg-slate-100 p-1 rounded border border-slate-200"
                   />
@@ -1349,7 +1349,7 @@ export default function CMSPageBuilderPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <div className="flex items-center gap-3">
                 <img
-                  src={headerConfig.megaMenuBanner?.imageUrl || '/images/cat_women.jpg'}
+                  src={getImageUrl(headerConfig.megaMenuBanner?.imageUrl) || '/images/cat_women.jpg'}
                   alt="Banner"
                   className="w-16 h-16 object-cover rounded border"
                 />

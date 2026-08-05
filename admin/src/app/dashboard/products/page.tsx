@@ -16,7 +16,7 @@ import {
   FolderTree,
   FolderPlus,
 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, API_BASE_URL, getImageUrl } from '@/lib/api';
 
 function safeParseGallery(val: any, fallback: string[] = ['/images/pdp_linen_main.jpg']): string[] {
   if (!val) return fallback;
@@ -184,7 +184,7 @@ export default function ProductManagementPage() {
       bodyData.append('file', files[i]);
 
       try {
-        const res = await fetch('http://localhost:5000/api/media/upload', {
+        const res = await fetch(`${API_BASE_URL}/media/upload`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('sanusha_token') || ''}`,
@@ -372,7 +372,7 @@ export default function ProductManagementPage() {
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={p.image}
+                          src={getImageUrl(p.image)}
                           alt={p.name}
                           className="w-12 h-14 object-cover rounded border border-slate-200 bg-slate-100 shrink-0"
                         />
@@ -633,7 +633,7 @@ export default function ProductManagementPage() {
                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 pt-2">
                   {formData.galleryImages.map((imgUrl, idx) => (
                     <div key={idx} className="relative group aspect-[3/4] bg-slate-200 rounded-md overflow-hidden border border-slate-300">
-                      <img src={imgUrl} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(imgUrl)} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                       <button
                         type="button"
                         onClick={() => removeGalleryImage(idx)}

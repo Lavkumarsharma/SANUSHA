@@ -22,7 +22,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Toast } from '@/components/Toast';
 import { useStore, PRODUCTS_DATA } from '@/store/useStore';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -122,7 +122,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       selectedImageIndex === idx ? 'border-[#6C307D] shadow-sm' : 'border-transparent hover:border-gray-300'
                     }`}
                   >
-                    <img src={imgUrl} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                    <img src={getImageUrl(imgUrl)} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -130,7 +130,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               {/* Main Interactive Slide Viewer */}
               <div className="relative aspect-[3/4] w-full bg-[#FAF8F5] rounded-xs border border-[#EBE7DF] overflow-hidden group">
                 <img
-                  src={gallery[selectedImageIndex] || product?.image}
+                  src={getImageUrl(gallery[selectedImageIndex] || product?.image)}
                   alt={product?.name}
                   className="w-full h-full object-cover object-center transition-all duration-300"
                 />
