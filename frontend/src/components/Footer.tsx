@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export const Footer: React.FC = () => {
   const [footerConfig, setFooterConfig] = useState({
@@ -26,10 +26,21 @@ export const Footer: React.FC = () => {
     copyrightText: '© 2026 SANUSHA Enterprise Platform. All rights reserved.',
   });
 
-  const [headerConfig, setHeaderConfig] = useState({
-    brandName: 'SANUSHA',
-    iconUrl: '',
-    logoUrl: '',
+  const [headerConfig, setHeaderConfig] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedHdr = localStorage.getItem('sanusha_cms_header_cache');
+        if (cachedHdr) {
+          const parsed = JSON.parse(cachedHdr);
+          if (parsed && parsed.brandName) return parsed;
+        }
+      } catch (e) {}
+    }
+    return {
+      brandName: 'SANUSHA',
+      iconUrl: '',
+      logoUrl: '',
+    };
   });
 
   useEffect(() => {
@@ -38,14 +49,19 @@ export const Footer: React.FC = () => {
       fetchApi('/cms/header').catch(() => null),
     ]).then(([ftr, hdr]) => {
       if (ftr) {
-        setFooterConfig((prev) => ({
+        setFooterConfig((prev: any) => ({
           ...prev,
           ...ftr,
           col1Links: ftr.col1Links !== undefined ? ftr.col1Links : prev.col1Links,
           col2Links: ftr.col2Links !== undefined ? ftr.col2Links : prev.col2Links,
         }));
       }
-      if (hdr && hdr.brandName) setHeaderConfig(hdr);
+      if (hdr && hdr.brandName) {
+        setHeaderConfig(hdr);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(hdr));
+        }
+      }
     });
   }, []);
 
@@ -55,11 +71,11 @@ export const Footer: React.FC = () => {
         {/* Brand Tagline & Dual Logo Display */}
         <div className="space-y-3">
           <Link href="/" className="flex items-center gap-2.5 group">
-            {headerConfig.iconUrl && (
-              <img src={headerConfig.iconUrl} alt="Brand Icon" className="h-9 w-auto object-contain" />
-            )}
-            {headerConfig.logoUrl ? (
-              <img src={headerConfig.logoUrl} alt={headerConfig.brandName} className="h-9 w-auto object-contain" />
+            {getImageUrl(headerConfig.iconUrl) ? (
+              <img src={getImageUrl(headerConfig.iconUrl)} alt="Brand Icon" className="h-9 w-auto object-contain" />
+            ) : null}
+            {getImageUrl(headerConfig.logoUrl) ? (
+              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-9 w-auto object-contain" />
             ) : (
               <span className="font-serif text-2xl font-bold tracking-[0.2em] text-gray-900 block group-hover:text-[#6C307D] transition-colors">
                 {headerConfig.brandName}
