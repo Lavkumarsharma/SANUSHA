@@ -12,16 +12,32 @@ export const AnnouncementBar: React.FC = () => {
   const wishlistCount = wishlist.length;
   const [userName, setUserName] = useState<string | null>(null);
 
-  const [config, setConfig] = useState({
-    announcementText1: 'FREE SHIPPING ON ORDERS OVER ₹999',
-    announcementText2: 'EASY RETURNS',
-    announcementText3: 'COD AVAILABLE',
+  const [config, setConfig] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedHdr = localStorage.getItem('sanusha_cms_header_cache');
+        if (cachedHdr) {
+          const parsed = JSON.parse(cachedHdr);
+          if (parsed && parsed.announcementText1) return parsed;
+        }
+      } catch (e) {}
+    }
+    return {
+      announcementText1: 'FREE SHIPPING ON ORDERS OVER ₹999',
+      announcementText2: 'EASY RETURNS',
+      announcementText3: 'COD AVAILABLE',
+    };
   });
 
   useEffect(() => {
     fetchApi('/cms/header')
       .then((data) => {
-        if (data && data.announcementText1) setConfig(data);
+        if (data && data.announcementText1) {
+          setConfig(data);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+          }
+        }
       })
       .catch(() => {});
 

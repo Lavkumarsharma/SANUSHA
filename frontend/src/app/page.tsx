@@ -97,34 +97,8 @@ export default function StorefrontHomePage() {
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Multi-Slide Hero State
-  const [heroSlides, setHeroSlides] = useState<any[]>([
-    {
-      id: 'slide-1',
-      title: 'TIMELESS ELEGANCE & MODERN PURITY',
-      subtitle: 'Hand-crafted luxury linen, refined silhouettes, and conscious fashion.',
-      badgeText: 'LUXURY EDIT 2026',
-      bannerUrl: '/images/hero_banner.jpg',
-      buttonText: 'SHOP THE COLLECTION',
-      buttonLink: '/shop',
-      showOverlay: true,
-      active: true,
-    },
-    {
-      id: 'slide-2',
-      title: 'RESORT & SUMMER LUXURY CO-ORDS',
-      subtitle: 'Breezy European flax linen sets designed for sun-soaked getaways.',
-      badgeText: 'SUMMER ESSENTIALS',
-      bannerUrl: '/images/summer_banner_model.jpg',
-      buttonText: 'EXPLORE RESORTWEAR',
-      buttonLink: '/shop?category=Resortwear',
-      showOverlay: true,
-      active: true,
-    },
-  ]);
-  const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
-
-  useEffect(() => {
+  // Multi-Slide Hero State with Instant Cache Hydration
+  const [heroSlides, setHeroSlides] = useState<any[]>(() => {
     if (typeof window !== 'undefined') {
       try {
         const cachedHero = localStorage.getItem('sanusha_cms_hero_cache');
@@ -132,12 +106,39 @@ export default function StorefrontHomePage() {
           const parsed = JSON.parse(cachedHero);
           if (Array.isArray(parsed) && parsed.length > 0) {
             const activeOnly = parsed.filter((s: any) => s.active !== false);
-            if (activeOnly.length > 0) setHeroSlides(activeOnly);
+            if (activeOnly.length > 0) return activeOnly;
           }
         }
       } catch (e) {}
     }
+    return [
+      {
+        id: 'slide-1',
+        title: 'TIMELESS ELEGANCE & MODERN PURITY',
+        subtitle: 'Hand-crafted luxury linen, refined silhouettes, and conscious fashion.',
+        badgeText: 'LUXURY EDIT 2026',
+        bannerUrl: '/images/hero_banner.jpg',
+        buttonText: 'SHOP THE COLLECTION',
+        buttonLink: '/shop',
+        showOverlay: true,
+        active: true,
+      },
+      {
+        id: 'slide-2',
+        title: 'RESORT & SUMMER LUXURY CO-ORDS',
+        subtitle: 'Breezy European flax linen sets designed for sun-soaked getaways.',
+        badgeText: 'SUMMER ESSENTIALS',
+        bannerUrl: '/images/summer_banner_model.jpg',
+        buttonText: 'EXPLORE RESORTWEAR',
+        buttonLink: '/shop?category=Resortwear',
+        showOverlay: true,
+        active: true,
+      },
+    ];
+  });
+  const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 
+  useEffect(() => {
     Promise.all([
       fetchApi('/products').catch(() => PRODUCTS_DATA),
       fetchApi('/categories').catch(() => []),

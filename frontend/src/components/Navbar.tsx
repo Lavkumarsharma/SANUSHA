@@ -31,53 +31,64 @@ export const Navbar: React.FC = () => {
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Dynamic Header & Mega Menu Settings
-  const [headerConfig, setHeaderConfig] = useState({
-    brandName: 'SANUSHA',
-    iconUrl: '',
-    logoUrl: '',
-    navItems: [
-      { id: '1', label: 'SHOP', url: '/shop', hasDropdown: true },
-      { id: '2', label: 'NEW ARRIVALS', url: '/shop?filter=new-arrivals', hasDropdown: false },
-      { id: '3', label: 'COLLECTIONS', url: '/shop?collection=all', hasDropdown: false },
-    ],
-    megaMenuColumns: [
-      {
-        id: 'col-1',
-        title: 'WOMEN',
-        links: [
-          { id: 'w-1', label: 'View All', url: '/category/women' },
-          { id: 'w-2', label: 'Tops & Shirts', url: '/category/women?type=Tops' },
-          { id: 'w-3', label: 'Trousers & Pants', url: '/category/women?type=Bottoms' },
-          { id: 'w-4', label: 'Co-ord Sets', url: '/category/women?type=Sets' },
-        ],
+  // Dynamic Header & Mega Menu Settings with Instant Cache Hydration
+  const [headerConfig, setHeaderConfig] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedHdr = localStorage.getItem('sanusha_cms_header_cache');
+        if (cachedHdr) {
+          const parsed = JSON.parse(cachedHdr);
+          if (parsed && parsed.brandName) return parsed;
+        }
+      } catch (e) {}
+    }
+    return {
+      brandName: 'SANUSHA',
+      iconUrl: '',
+      logoUrl: '',
+      navItems: [
+        { id: '1', label: 'SHOP', url: '/shop', hasDropdown: true },
+        { id: '2', label: 'NEW ARRIVALS', url: '/shop?filter=new-arrivals', hasDropdown: false },
+        { id: '3', label: 'COLLECTIONS', url: '/shop?collection=all', hasDropdown: false },
+      ],
+      megaMenuColumns: [
+        {
+          id: 'col-1',
+          title: 'WOMEN',
+          links: [
+            { id: 'w-1', label: 'View All', url: '/category/women' },
+            { id: 'w-2', label: 'Tops & Shirts', url: '/category/women?type=Tops' },
+            { id: 'w-3', label: 'Trousers & Pants', url: '/category/women?type=Bottoms' },
+            { id: 'w-4', label: 'Co-ord Sets', url: '/category/women?type=Sets' },
+          ],
+        },
+        {
+          id: 'col-2',
+          title: 'MEN',
+          links: [
+            { id: 'm-1', label: 'View All', url: '/category/men' },
+            { id: 'm-2', label: 'Button-Down Shirts', url: '/category/men?type=Shirts' },
+            { id: 'm-3', label: 'Cargo & Parachute Pants', url: '/category/men?type=Pants' },
+            { id: 'm-4', label: 'Footwear & Sneakers', url: '/category/men?type=Footwear' },
+          ],
+        },
+        {
+          id: 'col-3',
+          title: 'COLLECTIONS',
+          links: [
+            { id: 'c-1', label: 'Summer Edit', url: '/shop?collection=summer' },
+            { id: 'c-2', label: 'Bestsellers', url: '/shop?sort=bestsellers' },
+            { id: 'c-3', label: 'Linen Essentials', url: '/shop?material=linen' },
+          ],
+        },
+      ],
+      megaMenuBanner: {
+        imageUrl: '/images/cat_women.jpg',
+        title: 'NEW SEASON',
+        subtitle: 'Modern Linen',
+        linkUrl: '/shop',
       },
-      {
-        id: 'col-2',
-        title: 'MEN',
-        links: [
-          { id: 'm-1', label: 'View All', url: '/category/men' },
-          { id: 'm-2', label: 'Button-Down Shirts', url: '/category/men?type=Shirts' },
-          { id: 'm-3', label: 'Cargo & Parachute Pants', url: '/category/men?type=Pants' },
-          { id: 'm-4', label: 'Footwear & Sneakers', url: '/category/men?type=Footwear' },
-        ],
-      },
-      {
-        id: 'col-3',
-        title: 'COLLECTIONS',
-        links: [
-          { id: 'c-1', label: 'Summer Edit', url: '/shop?collection=summer' },
-          { id: 'c-2', label: 'Bestsellers', url: '/shop?sort=bestsellers' },
-          { id: 'c-3', label: 'Linen Essentials', url: '/shop?material=linen' },
-        ],
-      },
-    ],
-    megaMenuBanner: {
-      imageUrl: '/images/cat_women.jpg',
-      title: 'NEW SEASON',
-      subtitle: 'Modern Linen',
-      linkUrl: '/shop',
-    },
+    };
   });
 
   // Calculate live counters
@@ -92,23 +103,29 @@ export const Navbar: React.FC = () => {
       .then(([prods, data]) => {
         if (prods && prods.length > 0) setAllProducts(prods);
         if (data && data.brandName) {
-          setHeaderConfig((prev) => ({
-            ...prev,
-            ...data,
-            navItems: (data.navItems || prev.navItems)
-              .filter((item: any) => {
-                const lbl = item.label?.toUpperCase();
-                return lbl !== 'HOME' && lbl !== 'MY ACCOUNT' && lbl !== 'ACCOUNT';
-              })
-              .map((item: any) => {
-                if (item.label?.toUpperCase() === 'NEW ARRIVALS') {
-                  return { ...item, url: '/shop?filter=new-arrivals' };
-                }
-                return item;
-              }),
-            megaMenuColumns: data.megaMenuColumns || prev.megaMenuColumns,
-            megaMenuBanner: data.megaMenuBanner || prev.megaMenuBanner,
-          }));
+          setHeaderConfig((prev: any) => {
+            const updated = {
+              ...prev,
+              ...data,
+              navItems: (data.navItems || prev.navItems)
+                .filter((item: any) => {
+                  const lbl = item.label?.toUpperCase();
+                  return lbl !== 'HOME' && lbl !== 'MY ACCOUNT' && lbl !== 'ACCOUNT';
+                })
+                .map((item: any) => {
+                  if (item.label?.toUpperCase() === 'NEW ARRIVALS') {
+                    return { ...item, url: '/shop?filter=new-arrivals' };
+                  }
+                  return item;
+                }),
+              megaMenuColumns: data.megaMenuColumns || prev.megaMenuColumns,
+              megaMenuBanner: data.megaMenuBanner || prev.megaMenuBanner,
+            };
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(updated));
+            }
+            return updated;
+          });
         }
       })
       .catch(() => {});
@@ -181,7 +198,7 @@ export const Navbar: React.FC = () => {
           </button>
 
           <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-[11px] font-bold tracking-[0.18em] uppercase text-gray-800">
-            {headerConfig.navItems.map((item) => {
+            {headerConfig.navItems.map((item: any) => {
               if (item.hasDropdown) {
                 return (
                   <div
@@ -202,13 +219,13 @@ export const Navbar: React.FC = () => {
                     {/* Mega Dropdown Panel */}
                     {isMegaMenuOpen && (
                       <div className="absolute top-full left-0 w-[760px] bg-white border border-[#EBE7DF] shadow-2xl rounded-xs p-6 grid grid-cols-4 gap-7 z-50 text-xs normal-case transition-all animate-fadeIn">
-                        {headerConfig.megaMenuColumns.map((col, idx) => (
+                        {headerConfig.megaMenuColumns.map((col: any, idx: number) => (
                           <div key={col.id || idx} className="space-y-2.5">
                             <span className="text-[10px] font-bold tracking-[0.2em] text-[#6C307D] uppercase block pb-1 border-b border-purple-100">
                               {col.title}
                             </span>
                             <ul className="space-y-1.5 text-gray-600 font-medium text-[11px]">
-                              {col.links.map((subLink, sIdx) => (
+                              {col.links.map((subLink: any, sIdx: number) => (
                                 <li key={subLink.id || sIdx}>
                                   <Link
                                     href={subLink.url}
@@ -445,7 +462,7 @@ export const Navbar: React.FC = () => {
       {/* Mobile Drawer Navigation */}
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-[#EBE7DF] bg-white p-4 space-y-3 text-xs font-bold uppercase tracking-wider">
-          {headerConfig.navItems.map((item) => (
+          {headerConfig.navItems.map((item: any) => (
             <Link
               key={item.id || item.label}
               href={item.url}
