@@ -10,18 +10,18 @@ export const SummerBanner: React.FC = () => {
         
         {/* Left Text Content */}
         <div className="lg:col-span-6 p-8 sm:p-12 lg:p-16 space-y-4 z-10">
-          <span className="inline-block text-xs font-bold tracking-[0.25em] text-gray-600 uppercase">
-            SUMMER &apos;24 EDIT
+          <span className="inline-block text-xs font-bold tracking-[0.25em] text-[#6C307D] uppercase">
+            ARTISAN HOME FRAGRANCE
           </span>
 
           <h2 className="text-3xl sm:text-5xl font-serif font-bold text-gray-900 leading-tight tracking-tight">
-            SIMPLIFY. <br />
-            ELEVATE. <br />
-            REPEAT.
+            INFUSE YOUR <br />
+            SPACE WITH <br />
+            TRANQUILITY.
           </h2>
 
           <p className="text-xs sm:text-sm text-gray-700 max-w-md font-medium leading-relaxed">
-            Modern essentials for your everyday moments. Designed with breathable fabrics and timeless cuts.
+            Hand-poured aromatic diffusers, brass incense burners, and sandalwood notes designed to calm your senses.
           </p>
 
           <div className="pt-2">
@@ -29,7 +29,7 @@ export const SummerBanner: React.FC = () => {
               href="#new-arrivals"
               className="inline-flex items-center gap-2.5 bg-[#6C307D] hover:bg-[#522061] text-white text-xs font-bold tracking-widest uppercase px-6 py-3 rounded-xs shadow-xs transition-all hover:gap-3.5"
             >
-              EXPLORE COLLECTION
+              SHOP HOME FRAGRANCE
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -38,8 +38,8 @@ export const SummerBanner: React.FC = () => {
         {/* Right Image */}
         <div className="lg:col-span-6 h-72 sm:h-96 lg:h-full relative overflow-hidden">
           <img
-            src="/images/summer_banner.jpg"
-            alt="Summer '24 Edit Model"
+            src="/images/cat_home_fragrance.jpg"
+            alt="Artisan Home Fragrance"
             className="w-full h-full object-cover object-center"
           />
           {/* Subtle gradient blending on large screens */}

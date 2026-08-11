@@ -8,20 +8,22 @@ export const ShopByCategory: React.FC = () => {
   const { setSelectedCategory } = useStore();
 
   const categories = [
-    { title: 'WOMEN', image: '/images/cat_women.jpg', count: '120+ Styles' },
-    { title: 'MEN', image: '/images/cat_men.jpg', count: '85+ Styles' },
-    { title: 'TOPS', image: '/images/cat_tops.jpg', count: '90+ Styles' },
-    { title: 'BOTTOMS', image: '/images/cat_bottoms.jpg', count: '60+ Styles' },
+    { title: 'DECOR ACCENTS', image: '/images/cat_decor_accents.jpg', count: '45+ Pieces' },
+    { title: 'TEXTILES & CUSHIONS', image: '/images/cat_textiles_cushions.jpg', count: '30+ Designs' },
+    { title: 'HOME FRAGRANCE', image: '/images/cat_home_fragrance.jpg', count: '25+ Aromas' },
+    { title: 'WALL & ART', image: '/images/cat_wall_art.jpg', count: '40+ Artworks' },
   ];
 
   return (
     <section id="collections" className="py-16 px-4 sm:px-8 max-w-7xl mx-auto">
       {/* Heading */}
-      <div className="text-center mb-10">
-        <h2 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-widest uppercase">
-          SHOP BY CATEGORY
+      <div className="text-center mb-10 space-y-1">
+        <span className="text-xs font-bold tracking-[0.25em] text-[#6C307D] uppercase">
+          EXPLORE COLLECTIONS
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 tracking-tight">
+          Curated Home Decor Categories
         </h2>
-        <div className="w-12 h-[2px] bg-[#6C307D] mx-auto mt-2" />
       </div>
 
       {/* Grid */}

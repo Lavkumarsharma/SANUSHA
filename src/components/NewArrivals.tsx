@@ -32,8 +32,11 @@ export const NewArrivals: React.FC = () => {
       {/* Section Header */}
       <div className="flex items-center justify-between mb-8 pb-3 border-b border-[#EBE7DF]">
         <div>
-          <h2 className="text-xl sm:text-2xl font-serif font-bold text-gray-900 tracking-wider uppercase">
-            NEW ARRIVALS
+          <span className="text-[10px] font-bold tracking-[0.25em] text-[#6C307D] uppercase block">
+            HAND-PICKED FOR YOU
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-tight">
+            New Arrivals Spotlight
           </h2>
         </div>
 
@@ -41,7 +44,7 @@ export const NewArrivals: React.FC = () => {
           href="/shop"
           className="inline-flex items-center gap-1.5 text-xs font-bold tracking-widest text-[#6C307D] hover:text-[#522061] uppercase transition-colors"
         >
-          VIEW ALL
+          VIEW FULL STOREFRONT
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -50,11 +53,11 @@ export const NewArrivals: React.FC = () => {
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-sm">
           <p className="text-sm text-gray-500 font-medium">
-            No products match your criteria.
+            No decor products match your criteria.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {filteredProducts.slice(0, 6).map((product) => {
             const isWishlisted = wishlist.includes(product.id);
 

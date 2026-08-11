@@ -18,23 +18,13 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     id: 1,
-    tagline: 'NEW COLLECTION',
-    titleLine1: 'EFFORTLESSLY',
-    titleLine2: 'ELEGANT',
-    subtitle: 'Timeless styles for every you. Designed to inspire confidence.',
-    ctaText: 'SHOP NOW',
-    ctaLink: '#products',
-    image: '/images/hero_banner.jpg',
-  },
-  {
-    id: 2,
-    tagline: 'SUMMER ESSENTIALS',
-    titleLine1: 'MODERN',
-    titleLine2: 'MINIMALISM',
-    subtitle: 'Crafted with premium organic fabrics for ultimate comfort.',
-    ctaText: 'EXPLORE EDIT',
+    tagline: 'HANDCRAFTED LUXURY',
+    titleLine1: 'CRAFTED FOR',
+    titleLine2: 'BEAUTIFUL SPACES.',
+    subtitle: 'Timeless décor. Handcrafted with care. Made to bring warmth, meaning and elegance.',
+    ctaText: 'EXPLORE COLLECTION',
     ctaLink: '#collections',
-    image: '/images/summer_banner.jpg',
+    image: '/images/decor_hero_banner.jpg',
   },
 ];
 

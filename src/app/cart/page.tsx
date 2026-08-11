@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   X,
   Plus,
@@ -24,6 +25,7 @@ import { Toast } from '@/components/Toast';
 import { useStore, PRODUCTS_DATA } from '@/store/useStore';
 
 export default function CartPage() {
+  const router = useRouter();
   const {
     cart,
     removeFromCart,
@@ -63,7 +65,7 @@ export default function CartPage() {
   };
 
   const handleProceedToCheckout = () => {
-    addToast('Checkout Initiated', 'Redirecting to secure checkout gateway...');
+    router.push('/checkout');
   };
 
   return (

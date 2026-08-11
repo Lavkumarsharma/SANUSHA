@@ -7,23 +7,23 @@ export const ValuePropsBar: React.FC = () => {
   const items = [
     {
       icon: Truck,
-      title: 'FREE SHIPPING',
-      subtitle: 'On orders over ₹999',
-    },
-    {
-      icon: PackageCheck,
-      title: 'EASY RETURNS',
-      subtitle: 'Within 7 days',
+      title: 'FREE EXPRESS SHIPPING',
+      subtitle: 'On all orders above ₹999',
     },
     {
       icon: ShieldCheck,
-      title: 'SECURE PAYMENTS',
-      subtitle: '100% secure checkout',
+      title: '100% AUTHENTIC QUALITY',
+      subtitle: 'Natural materials & artisan made',
+    },
+    {
+      icon: PackageCheck,
+      title: 'HASSLE-FREE RETURNS',
+      subtitle: '14-day easy return policy',
     },
     {
       icon: Headset,
-      title: 'CUSTOMER SUPPORT',
-      subtitle: "We're here to help",
+      title: 'ARTISAN SUPPORT',
+      subtitle: 'Dedicated care & guidance',
     },
   ];
 

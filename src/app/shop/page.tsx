@@ -52,17 +52,14 @@ export default function ShopPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter Categories list matching reference screenshot
+  // Filter Categories list matching Home Decor catalog
   const categoriesList = [
-    { name: 'All Categories', count: 186 },
-    { name: 'New Arrivals', count: 32 },
-    { name: 'Women', count: 68 },
-    { name: 'Men', count: 62 },
-    { name: 'Tops', count: 48 },
-    { name: 'Bottoms', count: 38 },
-    { name: 'Dresses', count: 18 },
-    { name: 'Jackets', count: 20 },
-    { name: 'Accessories', count: 12 },
+    { name: 'All Categories', count: 140 },
+    { name: 'Decor Accents', count: 45 },
+    { name: 'Vases & Planters', count: 32 },
+    { name: 'Storage & Baskets', count: 28 },
+    { name: 'Wall & Art', count: 20 },
+    { name: 'Textiles & Cushions', count: 15 },
   ];
 
   const genderList = [
