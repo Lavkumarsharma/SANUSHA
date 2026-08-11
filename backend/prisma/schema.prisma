@@ -27,6 +27,7 @@ model Category {
   bannerImage String?
   icon        String?
   isMegaMenu  Boolean    @default(false)
+  order       Int        @default(0)
   parentId    String?
   parent      Category?  @relation("ParentCategory", fields: [parentId], references: [id])
   children    Category[] @relation("ParentCategory")

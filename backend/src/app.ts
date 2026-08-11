@@ -371,13 +371,37 @@ app.delete('/api/products/:id', authenticate, async (req: any, res: any) => {
 // 4. CATEGORIES & COLLECTIONS API
 // ----------------------------------------------------
 app.get('/api/categories', async (req: any, res: any) => {
-  const categories = await prisma.category.findMany({ include: { products: true } });
+  const categories = await prisma.category.findMany({
+    include: { products: true },
+    orderBy: { order: 'asc' },
+  });
   res.json(categories);
 });
 
 app.post('/api/categories', authenticate, async (req: any, res: any) => {
   const category = await prisma.category.create({ data: req.body });
   res.status(201).json(category);
+});
+
+app.put('/api/categories/reorder', async (req: any, res: any) => {
+  try {
+    const { items } = req.body; // Array of { id, order }
+    if (Array.isArray(items)) {
+      for (const item of items) {
+        await prisma.category.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        });
+      }
+    }
+    const updated = await prisma.category.findMany({
+      include: { products: true },
+      orderBy: { order: 'asc' },
+    });
+    res.json({ message: 'Reordered successfully', categories: updated });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.get('/api/collections', async (req: any, res: any) => {
