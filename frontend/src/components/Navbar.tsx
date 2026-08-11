@@ -280,14 +280,20 @@ export const Navbar: React.FC = () => {
           </nav>
         </div>
 
-        {/* 2. CENTER SECTION: BRAND EMBLEM LOGO ONLY */}
+        {/* 2. CENTER SECTION: PROPORTIONATE SLEEK BRAND LOGO & NAME */}
         <div className="flex-1 flex justify-center items-center shrink-0">
-          <Link href="/" className="flex items-center justify-center group py-0.5" title="SANUSHA Home">
-            <img
-              src="/icon.svg"
-              alt="SANUSHA Brand Emblem Logo"
-              className="h-9 sm:h-10 w-auto object-contain group-hover:scale-105 transition-transform"
-            />
+          <Link href="/" className="flex items-center justify-center gap-2 group py-0.5">
+            {getImageUrl(headerConfig.iconUrl) ? (
+              <img src={getImageUrl(headerConfig.iconUrl)} alt="Brand Icon" className="h-7 sm:h-8 w-auto object-contain" />
+            ) : null}
+
+            {getImageUrl(headerConfig.logoUrl) ? (
+              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-7 sm:h-8 w-auto object-contain" />
+            ) : (
+              <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.22em] text-gray-900 group-hover:text-[#6C307D] transition-colors">
+                {headerConfig.brandName}
+              </span>
+            )}
           </Link>
         </div>
 
