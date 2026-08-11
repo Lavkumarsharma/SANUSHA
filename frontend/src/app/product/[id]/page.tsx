@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import {
   Heart,
   ShoppingBag,
@@ -24,9 +25,9 @@ import { Toast } from '@/components/Toast';
 import { useStore, PRODUCTS_DATA } from '@/store/useStore';
 import { fetchApi, getImageUrl } from '@/lib/api';
 
-export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const productId = resolvedParams.id;
+export default function ProductDetailPage() {
+  const params = useParams();
+  const productId = (params?.id as string) || '1';
 
   const { wishlist, toggleWishlist, addToCart, addToast } = useStore();
   const [product, setProduct] = useState<any>(null);
