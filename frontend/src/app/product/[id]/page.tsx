@@ -194,18 +194,35 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
               <hr className="border-gray-100" />
 
-              {/* Size Swatches */}
+              {/* Dynamic Size / Dimension Selection */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-gray-900 uppercase">Select Size:</span>
-                  <span className="text-[#6C307D] hover:underline cursor-pointer font-bold">Size Guide</span>
+                  <span className="font-bold text-gray-900 uppercase">
+                    {product?.category?.name?.includes('Decor') ||
+                    product?.category?.includes('Decor') ||
+                    product?.category?.includes('Vases') ||
+                    product?.category?.includes('Storage') ||
+                    product?.category?.includes('Wall') ||
+                    product?.gender === 'Unisex'
+                      ? 'SELECT DIMENSIONS / SIZE:'
+                      : 'SELECT SIZE:'}
+                  </span>
+                  {!(
+                    product?.category?.name?.includes('Decor') ||
+                    product?.category?.includes('Decor') ||
+                    product?.category?.includes('Vases') ||
+                    product?.category?.includes('Storage') ||
+                    product?.category?.includes('Wall')
+                  ) && (
+                    <span className="text-[#6C307D] hover:underline cursor-pointer font-bold">Size Guide</span>
+                  )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {sizes.map((sz: string) => (
                     <button
                       key={sz}
                       onClick={() => setSelectedSize(sz)}
-                      className={`w-10 h-10 border rounded-xs text-xs font-bold transition-all ${
+                      className={`px-3 py-2 border rounded-xs text-xs font-bold transition-all ${
                         selectedSize === sz
                           ? 'border-[#6C307D] bg-[#6C307D] text-white shadow-xs'
                           : 'border-gray-300 text-gray-700 hover:border-gray-400 bg-white'
@@ -251,26 +268,42 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 </button>
               </div>
 
-              {/* Clothing Specifications & Features */}
+              {/* Product Specifications & Details */}
               <div className="border border-[#EBE7DF] rounded-xs p-4 bg-[#FAF8F5] space-y-3 text-xs">
                 <h3 className="font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-2">
-                  Clothing Specifications & Details
+                  {product?.category?.name?.includes('Decor') ||
+                  product?.category?.includes('Decor') ||
+                  product?.category?.includes('Vases') ||
+                  product?.category?.includes('Storage') ||
+                  product?.category?.includes('Wall') ||
+                  product?.gender === 'Unisex'
+                    ? 'PRODUCT CRAFTSMANSHIP & SPECIFICATIONS'
+                    : 'CLOTHING SPECIFICATIONS & DETAILS'}
                 </h3>
 
                 <div className="grid grid-cols-2 gap-2 text-gray-700 font-medium">
                   <div>
-                    <span className="text-gray-400 font-bold block">Fabric Material</span>
-                    <span className="font-semibold">{product?.material || '100% European Flax Linen'}</span>
+                    <span className="text-gray-400 font-bold block">Material</span>
+                    <span className="font-semibold">{product?.material || 'Handcrafted Clay & Solid Wood'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 font-bold block">Fit & Cut</span>
-                    <span className="font-semibold">{product?.fit || 'Oversized Fit'}</span>
+                    <span className="text-gray-400 font-bold block">
+                      {product?.category?.name?.includes('Decor') ||
+                      product?.category?.includes('Decor') ||
+                      product?.category?.includes('Vases') ||
+                      product?.category?.includes('Storage') ||
+                      product?.category?.includes('Wall') ||
+                      product?.gender === 'Unisex'
+                        ? 'Finish & Texture'
+                        : 'Fit & Cut'}
+                    </span>
+                    <span className="font-semibold">{product?.fit || product?.pattern || 'Matte Stone Finish'}</span>
                   </div>
                 </div>
 
                 {product?.detailsBullets && (
                   <div className="pt-2 border-t border-gray-200">
-                    <span className="text-gray-900 font-bold block mb-1">Key Features:</span>
+                    <span className="text-gray-900 font-bold block mb-1">Key Details:</span>
                     <p className="text-gray-600 leading-relaxed whitespace-pre-line text-[11px]">
                       {product.detailsBullets}
                     </p>
