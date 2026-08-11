@@ -647,6 +647,28 @@ export default function ProductManagementPage() {
                 </div>
               </div>
 
+              {/* Dynamic Sizes & Dimensions Editor */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                <label className="block font-bold text-slate-900 text-xs">
+                  Product Sizes / Dimensions Options
+                </label>
+                <p className="text-[11px] text-slate-500 font-normal">
+                  For Home Decor enter dimensions like 'Standard (9")', 'Tall (12")', 'Medium (15")'. For Clothing enter S, M, L, XL.
+                </p>
+                <input
+                  type="text"
+                  value={formData.sizes.join(', ')}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      sizes: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                    })
+                  }
+                  placeholder="e.g. Standard (9&quot;), Tall (12&quot;) OR S, M, L, XL"
+                  className="w-full border border-slate-300 rounded-md p-2.5 text-slate-900 bg-white font-semibold"
+                />
+              </div>
+
               {/* Description */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Product Description</label>

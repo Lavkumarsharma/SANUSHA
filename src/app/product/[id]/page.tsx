@@ -253,39 +253,61 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* SIZE Selection */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-gray-900 uppercase tracking-wider">
-                  SIZE:
-                </span>
-                <button
-                  onClick={() => setActiveTab('sizeGuide')}
-                  className="text-[11px] font-bold text-gray-600 hover:text-[#6C307D] underline flex items-center gap-1"
-                >
-                  📐 Size Guide
-                </button>
-              </div>
+            {/* Dynamic Dimension / Size Selection */}
+            {product.sizeOptions && product.sizeOptions.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-gray-900 uppercase tracking-wider">
+                    {product.category?.includes('Decor') ||
+                    product.category?.includes('Vases') ||
+                    product.category?.includes('Storage') ||
+                    product.category?.includes('Wall') ||
+                    product.gender === 'Unisex'
+                      ? 'SELECT DIMENSIONS / SIZE:'
+                      : 'SELECT SIZE:'}
+                  </span>
+                  {!(
+                    product.category?.includes('Decor') ||
+                    product.category?.includes('Vases') ||
+                    product.category?.includes('Storage') ||
+                    product.category?.includes('Wall')
+                  ) && (
+                    <button
+                      onClick={() => setActiveTab('sizeGuide')}
+                      className="text-[11px] font-bold text-gray-600 hover:text-[#6C307D] underline flex items-center gap-1"
+                    >
+                      📐 Size Guide
+                    </button>
+                  )}
+                </div>
 
-              <div className="grid grid-cols-6 gap-2">
-                {product.sizeOptions.map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => setSelectedSize(sz)}
-                    className={`py-2 text-xs font-bold rounded-xs border transition-all ${
-                      selectedSize === sz
-                        ? 'border-[#6C307D] bg-[#6C307D] text-white shadow-xs'
-                        : 'border-gray-200 bg-white text-gray-800 hover:border-gray-400'
-                    }`}
-                  >
-                    {sz}
-                  </button>
-                ))}
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {product.sizeOptions.map((sz) => (
+                    <button
+                      key={sz}
+                      onClick={() => setSelectedSize(sz)}
+                      className={`py-2 px-2 text-xs font-bold rounded-xs border transition-all text-center ${
+                        selectedSize === sz
+                          ? 'border-[#6C307D] bg-[#6C307D] text-white shadow-xs'
+                          : 'border-gray-200 bg-white text-gray-800 hover:border-gray-400'
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+                {!(
+                  product.category?.includes('Decor') ||
+                  product.category?.includes('Vases') ||
+                  product.category?.includes('Storage') ||
+                  product.category?.includes('Wall')
+                ) && (
+                  <p className="text-[11px] text-gray-500 italic mt-1">
+                    Model is 188cm tall and wearing size M
+                  </p>
+                )}
               </div>
-              <p className="text-[11px] text-gray-500 italic mt-1">
-                Model is 188cm tall and wearing size M
-              </p>
-            </div>
+            )}
 
             {/* QUANTITY Stepper */}
             <div className="space-y-2">
@@ -427,7 +449,7 @@ export default function ProductDetailPage() {
                 )}
               </div>
 
-              {/* Size & Fit Accordion */}
+              {/* Specifications & Dimensions Accordion */}
               <div className="py-3">
                 <button
                   onClick={() => toggleAccordion('sizeFit')}
@@ -435,13 +457,27 @@ export default function ProductDetailPage() {
                 >
                   <span className="flex items-center gap-2">
                     <Feather className="w-4 h-4 text-[#6C307D]" />
-                    SIZE & FIT
+                    {product.category?.includes('Decor') ||
+                    product.category?.includes('Vases') ||
+                    product.category?.includes('Storage') ||
+                    product.category?.includes('Wall') ||
+                    product.gender === 'Unisex'
+                      ? 'DIMENSIONS & CRAFTSMANSHIP'
+                      : 'SIZE & FIT'}
                   </span>
                   {openAccordions.sizeFit ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
                 </button>
                 {openAccordions.sizeFit && (
                   <div className="mt-3 text-xs text-gray-600 pl-6 space-y-1.5 animate-in fade-in duration-200">
-                    <p>Oversized relaxed fit. Designed for comfort and effortless draping.</p>
+                    <p>
+                      {product.category?.includes('Decor') ||
+                      product.category?.includes('Vases') ||
+                      product.category?.includes('Storage') ||
+                      product.category?.includes('Wall') ||
+                      product.gender === 'Unisex'
+                        ? 'Handcrafted dimensions designed to elevate tabletop surfaces, mantels, and living room corners.'
+                        : 'Oversized relaxed fit. Designed for comfort and effortless draping.'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -452,36 +488,16 @@ export default function ProductDetailPage() {
 
         </div>
 
-        {/* Product Highlights Strip matching reference */}
+        {/* Product Highlights Strip matching product category */}
         <section className="bg-[#FAF8F5] border-y border-[#EBE7DF] py-8 px-4 sm:px-8">
           <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-white border border-[#E5E2DA] flex items-center justify-center text-[#6C307D] shadow-xs">
-                <Rss className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Breathable</h4>
-                <p className="text-[11px] text-gray-500">Keeps you fresh</p>
-              </div>
-            </div>
-
             <div className="flex flex-col items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-white border border-[#E5E2DA] flex items-center justify-center text-[#6C307D] shadow-xs">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Premium Fabric</h4>
-                <p className="text-[11px] text-gray-500">100% Linen</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-white border border-[#E5E2DA] flex items-center justify-center text-[#6C307D] shadow-xs">
-                <Shirt className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Oversized Fit</h4>
-                <p className="text-[11px] text-gray-500">Relaxed & Comfortable</p>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Handcrafted Artistry</h4>
+                <p className="text-[11px] text-gray-500">Made by master artisans</p>
               </div>
             </div>
 
@@ -490,8 +506,28 @@ export default function ProductDetailPage() {
                 <Feather className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Lightweight</h4>
-                <p className="text-[11px] text-gray-500">Perfect for all-day wear</p>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Sustainable Material</h4>
+                <p className="text-[11px] text-gray-500">{product.material || 'Natural Clay & Wood'}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-white border border-[#E5E2DA] flex items-center justify-center text-[#6C307D] shadow-xs">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Durable Quality</h4>
+                <p className="text-[11px] text-gray-500">Built to last in any space</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-white border border-[#E5E2DA] flex items-center justify-center text-[#6C307D] shadow-xs">
+                <Truck className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Shatter-Proof Packaging</h4>
+                <p className="text-[11px] text-gray-500">Safe doorstep delivery</p>
               </div>
             </div>
           </div>
