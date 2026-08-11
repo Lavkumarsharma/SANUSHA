@@ -83,44 +83,35 @@ function resolveDistinctProductImage(name: string, fallbackImg?: string) {
   return fallbackImg || '/images/pdp_linen_main.jpg';
 }
 
-// Seed/Clean CMS Sections Routine
+// Seed CMS Sections Routine (Only creates default if DB is empty, NEVER wipes user edits)
 async function seedCleanCMSSections() {
   try {
-    const existing = await prisma.cmsSection.findMany();
-    const keys = existing.map((s) => s.key);
-    if (keys.includes('announcement_bar') || keys.includes('hero_slider') || keys.includes('summer_banner') || existing.length === 0) {
-      await prisma.cmsSection.deleteMany({});
+    const existingCount = await prisma.cmsSection.count();
+    if (existingCount === 0) {
       await prisma.cmsSection.createMany({
         data: [
           {
             key: 'hero',
-            title: 'TIMELESS ELEGANCE & MODERN PURITY',
-            subtitle: 'Hand-crafted luxury linen, refined silhouettes, and conscious fashion.',
-            image: '/images/hero_banner.jpg',
-            ctaText: 'SHOP THE COLLECTION',
+            title: 'CRAFTED FOR BEAUTIFUL SPACES.',
+            subtitle: 'Timeless décor. Handcrafted with care. Made to bring warmth, meaning and elegance.',
+            image: '/images/decor_hero_banner.jpg',
+            ctaText: 'EXPLORE COLLECTION',
             ctaLink: '/shop',
             order: 1,
             isVisible: true,
-          },
-          {
-            key: 'categories',
-            title: 'Curated Fashion Categories',
-            subtitle: 'Explore our hand-selected women, men, tops, and bottoms collections',
-            image: '/images/cat_women.jpg',
-            ctaText: 'EXPLORE ALL',
-            ctaLink: '/shop',
-            order: 2,
-            isVisible: true,
-          },
-          {
-            key: 'new_arrivals',
-            title: 'New Arrivals Spotlight',
-            subtitle: 'Fresh seasonal styles crafted with European flax linen',
-            image: '/images/pdp_linen_main.jpg',
-            ctaText: 'VIEW ALL NEW',
-            ctaLink: '/shop',
-            order: 3,
-            isVisible: true,
+            contentJson: JSON.stringify([
+              {
+                id: 'slide-1',
+                title: 'CRAFTED FOR BEAUTIFUL SPACES.',
+                subtitle: 'Timeless décor. Handcrafted with care. Made to bring warmth, meaning and elegance.',
+                badgeText: 'HANDCRAFTED LUXURY',
+                bannerUrl: '/images/decor_hero_banner.jpg',
+                buttonText: 'EXPLORE COLLECTION',
+                buttonLink: '/shop',
+                showOverlay: true,
+                active: true,
+              },
+            ]),
           },
         ],
       });
