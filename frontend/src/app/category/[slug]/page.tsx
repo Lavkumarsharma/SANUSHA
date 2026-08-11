@@ -174,7 +174,7 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ slug:
           ) : (
             <div className={viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6' : 'space-y-4'}>
               {sortedProducts.map((product) => {
-                const isWishlisted = wishlist.includes(product.id);
+                const isWishlisted = Array.isArray(wishlist) && wishlist.includes(product.id);
 
                 return (
                   <div

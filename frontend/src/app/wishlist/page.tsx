@@ -34,11 +34,12 @@ export default function CustomerWishlistPage() {
   }, []);
 
   // Filter ONLY items that are in the user's wishlist
-  const wishlistProducts = allProducts.filter((p) => wishlist.includes(p.id));
+  const safeWishlist = Array.isArray(wishlist) ? wishlist : [];
+  const wishlistProducts = allProducts.filter((p) => safeWishlist.includes(p.id));
 
   const handleClearAll = () => {
     if (confirm('Are you sure you want to clear your wishlist?')) {
-      wishlist.forEach((id) => toggleWishlist(id));
+      safeWishlist.forEach((id) => toggleWishlist(id));
       addToast('Wishlist Cleared', 'All items have been removed from your wishlist.');
     }
   };

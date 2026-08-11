@@ -344,7 +344,7 @@ export default function StorefrontHomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {newArrivals.map((product) => {
-              const isWishlisted = (wishlist || []).includes(product.id);
+              const isWishlisted = Array.isArray(wishlist) && wishlist.includes(product.id);
               const prodImg = getProductImage(product);
 
               return (

@@ -23,6 +23,9 @@ export interface Product {
   stock?: number;
   isNewArrival?: boolean;
   status?: string;
+  rating?: number;
+  reviewsCount?: number;
+  shippingInfo?: string;
 }
 
 export interface CartItem {
@@ -281,10 +284,11 @@ export const useStore = create<StoreState>()(
 
       toggleWishlist: (productId) =>
         set((state) => {
-          const exists = state.wishlist.includes(productId);
+          const currentWishlist = Array.isArray(state.wishlist) ? state.wishlist : [];
+          const exists = currentWishlist.includes(productId);
           const updated = exists
-            ? state.wishlist.filter((id) => id !== productId)
-            : [...state.wishlist, productId];
+            ? currentWishlist.filter((id) => id !== productId)
+            : [...currentWishlist, productId];
 
           return {
             wishlist: updated,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -26,17 +26,14 @@ import {
 } from 'lucide-react';
 import { AnnouncementBar } from '@/components/AnnouncementBar';
 import { Navbar } from '@/components/Navbar';
-import { ValuePropsBar } from '@/components/ValuePropsBar';
 import { Footer } from '@/components/Footer';
-import { CartDrawer } from '@/components/CartDrawer';
-import { QuickViewModal } from '@/components/QuickViewModal';
 import { Toast } from '@/components/Toast';
 import {
   useStore,
   PRODUCTS_DATA,
-  COMPLETE_THE_LOOK_ITEMS,
   Product,
 } from '@/store/useStore';
+import { fetchApi } from '@/lib/api';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -44,12 +41,38 @@ export default function ProductDetailPage() {
 
   const { wishlist, toggleWishlist, addToCart, addToast } = useStore();
 
+  const [fetchedProduct, setFetchedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (!rawId) return;
+    fetchApi(`/products/${rawId}`)
+      .then((data) => {
+        if (data && data.id) setFetchedProduct(data);
+      })
+      .catch(() => {
+        fetchApi('/products')
+          .then((all) => {
+            if (Array.isArray(all)) {
+              const found = all.find((p: any) => p.id === rawId || p.slug === rawId);
+              if (found) setFetchedProduct(found);
+            }
+          })
+          .catch(() => {});
+      });
+  }, [rawId]);
+
   // Find product by id or slug, or fallback safely to product #1
   const product: Product =
-    PRODUCTS_DATA.find((p) => p.id === rawId || (p as any).slug === rawId) || PRODUCTS_DATA[0];
+    fetchedProduct ||
+    PRODUCTS_DATA.find((p) => p.id === rawId || (p as any).slug === rawId) ||
+    PRODUCTS_DATA[0];
 
-  const sizeOpts = product.sizeOptions || ['Standard (9")', 'Tall (12")'];
-  const colorHexList = product.colorHexes || ['#5A3E2B', '#8C6D53', '#1F1F1F'];
+  const sizeOpts: string[] =
+    (Array.isArray(product.sizes) && product.sizes.length > 0
+      ? product.sizes
+      : (product as any).sizeOptions) || ['Standard (9")', 'Tall (12")'];
+
+  const colorHexList: string[] = (product as any).colorHexes || ['#5A3E2B', '#8C6D53', '#1F1F1F'];
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(sizeOpts[0] || 'Standard');
@@ -69,13 +92,21 @@ export default function ProductDetailPage() {
     setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const isWishlisted = (wishlist || []).includes(product.id);
-  const gallery = (product.galleryImages && product.galleryImages.length > 0)
-    ? product.galleryImages
-    : [product.image || '/images/prod_lantern_1.jpg'];
+  const isWishlisted = Array.isArray(wishlist) && wishlist.includes(product.id);
+  const gallery =
+    Array.isArray(product.galleryImages) && product.galleryImages.length > 0
+      ? product.galleryImages
+      : Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : [product.image || '/images/prod_lantern_1.jpg'];
 
   const colorName =
-    (product.colors && product.colors[selectedColorIndex]) || 'Warm Teak';
+    ((product as any).colors && (product as any).colors[selectedColorIndex]) || 'Warm Teak';
+
+  const categoryName =
+    typeof product.category === 'object' && product.category !== null
+      ? (product.category as any).name || 'Decor'
+      : (product.category as string) || 'Decor';
 
   const relatedProducts = PRODUCTS_DATA.filter((p) => p.id !== product.id);
 
@@ -98,7 +129,7 @@ export default function ProductDetailPage() {
             </Link>
             <span>/</span>
             <Link href="/shop" className="hover:text-[#6C307D] transition-colors">
-              {product.category || 'Decor'}
+              {categoryName}
             </Link>
             <span>/</span>
             <span className="text-gray-900 font-bold">{product.name}</span>
@@ -214,9 +245,9 @@ export default function ProductDetailPage() {
                       <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
                     ))}
                   </div>
-                  <span>{product.rating || 4.8}</span>
+                  <span>{(product as any).rating || 4.8}</span>
                   <a href="#reviews" className="text-gray-400 hover:underline">
-                    ({product.reviewsCount || 128} reviews)
+                    ({(product as any).reviewsCount || 128} reviews)
                   </a>
                 </div>
               </div>
@@ -238,7 +269,7 @@ export default function ProductDetailPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  {colorHexList.map((hex, idx) => (
+                  {colorHexList.map((hex: string, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedColorIndex(idx)}
@@ -264,7 +295,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {sizeOpts.map((sz) => (
+                  {sizeOpts.map((sz: string) => (
                     <button
                       key={sz}
                       onClick={() => setSelectedSize(sz)}
@@ -308,7 +339,7 @@ export default function ProductDetailPage() {
             {/* CTA Buttons (ADD TO BAG + WISHLIST) */}
             <div className="flex items-center gap-3 pt-2">
               <button
-                onClick={() => addToCart(product, selectedSize, colorName, quantity)}
+                onClick={() => addToCart(product, selectedSize, quantity, colorName)}
                 className="flex-1 bg-[#6C307D] hover:bg-[#522061] text-white text-xs font-bold tracking-widest uppercase py-3.5 rounded-xs flex items-center justify-center gap-2 transition-all shadow-md"
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -371,11 +402,18 @@ export default function ProductDetailPage() {
                 {openAccordions.details && (
                   <div className="mt-3 text-xs text-gray-600 space-y-2 pl-6 animate-in fade-in duration-200">
                     <p>{product.description}</p>
-                    {product.detailsBulletPoints && (
+                    {((product as any).detailsBulletPoints || (product as any).detailsBullets) && (
                       <ul className="list-disc pl-4 space-y-1">
-                        {product.detailsBulletPoints.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
+                        {Array.isArray((product as any).detailsBulletPoints)
+                          ? (product as any).detailsBulletPoints.map((item: string, idx: number) => (
+                              <li key={idx}>{item}</li>
+                            ))
+                          : typeof ((product as any).detailsBulletPoints || (product as any).detailsBullets) === 'string'
+                          ? ((product as any).detailsBulletPoints || (product as any).detailsBullets)
+                              .split('\n')
+                              .filter((line: string) => line.trim().length > 0)
+                              .map((item: string, idx: number) => <li key={idx}>{item.replace(/^[•\-\*]\s*/, '')}</li>)
+                          : null}
                       </ul>
                     )}
                   </div>
@@ -416,7 +454,7 @@ export default function ProductDetailPage() {
                 </button>
                 {openAccordions.shipping && (
                   <div className="mt-3 text-xs text-gray-600 pl-6 space-y-1.5 animate-in fade-in duration-200">
-                    <p>{product.shippingInfo || 'Free standard shipping on orders over ₹999. Dispatch within 24 hours in shatter-proof eco packaging.'}</p>
+                    <p>{(product as any).shippingInfo || 'Free standard shipping on orders over ₹999. Dispatch within 24 hours in shatter-proof eco packaging.'}</p>
                   </div>
                 )}
               </div>
@@ -474,8 +512,6 @@ export default function ProductDetailPage() {
       </main>
 
       <Footer />
-      <CartDrawer />
-      <QuickViewModal />
       <Toast />
     </div>
   );
