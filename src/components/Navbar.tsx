@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, User } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   return (
@@ -37,8 +37,8 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Search Bar */}
-        <div className="flex items-center gap-3">
+        {/* Search Bar & User Actions */}
+        <div className="flex items-center gap-4">
           <div className="relative w-48 sm:w-64">
             <input
               type="text"
@@ -47,6 +47,14 @@ export const Navbar: React.FC = () => {
             />
             <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           </div>
+
+          <Link
+            href="/login"
+            className="p-2 text-gray-700 hover:text-[#6C307D] transition-colors rounded-full hover:bg-gray-100"
+            title="Sign In / Account"
+          >
+            <User className="w-5 h-5" />
+          </Link>
         </div>
 
       </div>
