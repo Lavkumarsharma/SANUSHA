@@ -289,16 +289,16 @@ export default function StorefrontHomePage() {
               EXPLORE COLLECTIONS
             </span>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900">
-              Curated Fashion Categories
+              Curated Home Decor Categories
             </h2>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {(categories.length > 0 ? categories : [
-              { name: 'Women', image: '/images/cat_women.jpg', slug: 'women' },
-              { name: 'Men', image: '/images/cat_men.jpg', slug: 'men' },
-              { name: 'Tops', image: '/images/cat_tops.jpg', slug: 'tops' },
-              { name: 'Bottoms', image: '/images/cat_bottoms.jpg', slug: 'bottoms' },
+              { name: 'Decor Accents', image: '/images/cat_decor_accents.jpg', slug: 'decor-accents' },
+              { name: 'Vases & Planters', image: '/images/prod_ceramic_vase_1.jpg', slug: 'vases-planters' },
+              { name: 'Storage & Baskets', image: '/images/prod_basket_1.jpg', slug: 'storage-baskets' },
+              { name: 'Wall & Art', image: '/images/cat_wall_art.jpg', slug: 'wall-art' },
             ]).map((cat, idx) => (
               <Link
                 key={idx}
@@ -306,7 +306,7 @@ export default function StorefrontHomePage() {
                 className="group relative aspect-[3/4] rounded-xs overflow-hidden bg-gray-100 border border-[#EBE7DF]"
               >
                 <img
-                  src={getImageUrl(cat.image) || '/images/cat_women.jpg'}
+                  src={getImageUrl(cat.image) || '/images/cat_decor_accents.jpg'}
                   alt={cat.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

@@ -16,6 +16,11 @@ export function getImageUrl(url: string | undefined | null): string {
     return '';
   }
 
+  // Local public images should load directly from the Next.js static asset public directory
+  if (trimmed.startsWith('/images/')) {
+    return trimmed;
+  }
+
   const backendHost = API_BASE_URL.replace(/\/api\/?$/, '');
 
   if (trimmed.startsWith('http://localhost:5000') || trimmed.startsWith('http://127.0.0.1:5000')) {
