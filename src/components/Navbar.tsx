@@ -14,11 +14,13 @@ export const Navbar: React.FC = () => {
     <header className="bg-white sticky top-0 z-40 border-b border-[#EBE7DF] shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-6">
         
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="font-serif text-3xl font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#6C307D] transition-colors">
-            SANUSHA
-          </span>
+        {/* Brand Emblem Logo Only */}
+        <Link href="/" className="flex items-center group">
+          <img
+            src="/icon.svg"
+            alt="SANUSHA Brand Emblem Logo"
+            className="h-9 sm:h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+          />
         </Link>
 
         {/* Center Nav Links */}

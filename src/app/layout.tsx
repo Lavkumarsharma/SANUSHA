@@ -1,36 +1,16 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "SANUSHA | Effortlessly Elegant Luxury Fashion",
-  description:
-    "Discover timeless fashion styles, linen co-ords, luxury tops, and modern clothing essentials at SANUSHA. Free Shipping on orders over ₹999. Easy 7-day returns.",
-  keywords: [
-    "SANUSHA",
-    "Fashion",
-    "Luxury Clothing",
-    "Women Fashion",
-    "Men Fashion",
-    "Linen Co-ords",
-    "Summer Collection",
-    "India Fashion Brand",
-  ],
-  openGraph: {
-    title: "SANUSHA | Effortlessly Elegant Luxury Fashion",
-    description:
-      "Timeless fashion, crafted with purpose. Designed to empower. Made to last.",
-    url: "https://sanusha.com",
-    siteName: "SANUSHA",
-    images: [
-      {
-        url: "/images/hero_banner.jpg",
-        width: 1200,
-        height: 630,
-        alt: "SANUSHA Luxury Fashion Collection",
-      },
+  title: 'SANUSHA | Luxury Home Decor & Living',
+  description: 'Timeless decor, crafted with purpose. Designed to elevate. Made to last.',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
     ],
-    locale: "en_IN",
-    type: "website",
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
 };
 
@@ -39,39 +19,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ClothingStore",
-    name: "SANUSHA",
-    image: "https://sanusha.com/images/hero_banner.jpg",
-    description:
-      "Timeless fashion, crafted with purpose. Designed to empower. Made to last.",
-    priceRange: "₹899 - ₹3499",
-    telephone: "+91-9876543210",
-    address: {
-      "@type": "PostalAddress",
-      addressCountry: "IN",
-    },
-  };
-
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="preload"
-          as="style"
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/icon.svg" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
-      <body className="antialiased selection:bg-[#6C307D] selection:text-white">
-        {children}
-      </body>
+      <body className="bg-white text-gray-900 antialiased">{children}</body>
     </html>
   );
 }
