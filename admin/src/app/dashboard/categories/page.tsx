@@ -69,15 +69,11 @@ export default function CategoryManagementPage() {
     setOrderChanged(true);
   };
 
-  const handleDragEnd = () => {
-    setDraggedIdx(null);
-  };
-
   // Save new ordering to backend API
-  const handleSaveOrder = async () => {
+  const saveOrderList = async (updatedList: any[], isManual = false) => {
     setSavingOrder(true);
     try {
-      const itemsToUpdate = categories.map((cat, idx) => ({
+      const itemsToUpdate = updatedList.map((cat, idx) => ({
         id: cat.id,
         order: idx + 1,
       }));
@@ -88,12 +84,24 @@ export default function CategoryManagementPage() {
       });
 
       setOrderChanged(false);
-      alert('🎉 Category display order saved successfully! Frontend is now synced.');
+      if (isManual) {
+        alert('🎉 Category display order saved successfully! Frontend is now synced.');
+      }
     } catch (err: any) {
-      alert('Failed to save order: ' + err.message);
+      if (isManual) alert('Failed to save order: ' + err.message);
+      console.error('Category reorder error:', err);
     } finally {
       setSavingOrder(false);
     }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIdx(null);
+    saveOrderList(categories, false);
+  };
+
+  const handleSaveOrder = async () => {
+    saveOrderList(categories, true);
   };
 
   const filteredCategories = categories.filter((c) =>

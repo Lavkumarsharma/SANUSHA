@@ -16,6 +16,11 @@ export function getImageUrl(url: string | undefined | null): string {
     return '';
   }
 
+  // Base64 data URLs & Blob URLs work directly in any browser on any device
+  if (trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+    return trimmed;
+  }
+
   // Local public images should load directly from the Next.js static asset public directory
   if (trimmed.startsWith('/images/')) {
     return trimmed;
@@ -23,12 +28,22 @@ export function getImageUrl(url: string | undefined | null): string {
 
   const backendHost = API_BASE_URL.replace(/\/api\/?$/, '');
 
+  let effectiveHost = backendHost;
+  if (
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    (backendHost.includes('localhost') || backendHost.includes('127.0.0.1'))
+  ) {
+    effectiveHost = window.location.origin;
+  }
+
   if (trimmed.startsWith('http://localhost:5000') || trimmed.startsWith('http://127.0.0.1:5000')) {
-    return trimmed.replace(/^http:\/\/(localhost|127\.0\.0\.1):5000/, backendHost);
+    return trimmed.replace(/^http:\/\/(localhost|127\.0\.0\.1):5000/, effectiveHost);
   }
 
   if (trimmed.startsWith('/uploads/')) {
-    return `${backendHost}${trimmed}`;
+    return `${effectiveHost}${trimmed}`;
   }
 
   return trimmed;

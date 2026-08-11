@@ -613,6 +613,29 @@ export default function CMSPageBuilderPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Immediately create a base64 data URL for cross-device compatibility
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Url = reader.result as string;
+      if (base64Url) {
+        if (field === 'heroSlide' && typeof slideIndex === 'number') {
+          handleUpdateHeroSlide(slideIndex, 'bannerUrl', base64Url);
+        }
+        if (field === 'icon') setHeaderConfig((prev) => ({ ...prev, iconUrl: base64Url }));
+        if (field === 'logo') setHeaderConfig((prev) => ({ ...prev, logoUrl: base64Url }));
+        if (field === 'megaBanner') {
+          setHeaderConfig((prev) => ({
+            ...prev,
+            megaMenuBanner: { ...(prev.megaMenuBanner || {}), imageUrl: base64Url },
+          }));
+        }
+        if (field === 'section' && typeof sectionIndex === 'number') {
+          handleUpdateSection(sectionIndex, 'bannerUrl', base64Url);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('altText', file.name);
@@ -644,7 +667,7 @@ export default function CMSPageBuilderPage() {
         }
       }
     } catch (err: any) {
-      alert('Upload failed: ' + err.message);
+      console.warn('Backend file upload fallback to base64 data URL:', err);
     } finally {
       setUploading(null);
     }
@@ -657,6 +680,24 @@ export default function CMSPageBuilderPage() {
     sectionIndex?: number,
     slideIndex?: number
   ) => {
+    // Immediately apply base64 image locally to ensure cross-device consistency
+    if (base64) {
+      if (field === 'icon') setHeaderConfig((prev) => ({ ...prev, iconUrl: base64 }));
+      if (field === 'logo') setHeaderConfig((prev) => ({ ...prev, logoUrl: base64 }));
+      if (field === 'megaBanner') {
+        setHeaderConfig((prev) => ({
+          ...prev,
+          megaMenuBanner: { ...(prev.megaMenuBanner || {}), imageUrl: base64 },
+        }));
+      }
+      if (field === 'heroSlide' && typeof slideIndex === 'number') {
+        handleUpdateHeroSlide(slideIndex, 'bannerUrl', base64);
+      }
+      if (field === 'section' && typeof sectionIndex === 'number') {
+        handleUpdateSection(sectionIndex, 'bannerUrl', base64);
+      }
+    }
+
     try {
       setUploading(field);
       const res = await fetch(`${API_BASE_URL}/media/upload`, {
@@ -689,7 +730,7 @@ export default function CMSPageBuilderPage() {
         }
       }
     } catch (err: any) {
-      alert('Upload failed: ' + err.message);
+      console.warn('Cropped image upload fallback to base64:', err);
     } finally {
       setUploading(null);
       setCropModalData(null);
