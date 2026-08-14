@@ -14,10 +14,17 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const effectiveMongoUrl = process.env.MONGODB_URI || process.env.DATABASE_URL || '';
+const isValidMongo = typeof effectiveMongoUrl === 'string' && effectiveMongoUrl.startsWith('mongo');
+
+if (isValidMongo) {
+  process.env.DATABASE_URL = effectiveMongoUrl;
+}
+
 const app = express();
 const prisma = new PrismaClient(
-  process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('mongo')
-    ? { datasources: { db: { url: process.env.DATABASE_URL } } }
+  isValidMongo
+    ? { datasources: { db: { url: effectiveMongoUrl } } }
     : undefined
 );
 const PORT = process.env.PORT || 5000;
