@@ -287,8 +287,8 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* 2. CENTER SECTION: ABSOLUTELY CENTERED BRAND LOGO & NAME */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex justify-center items-center pointer-events-auto z-10">
-          <Link href="/" className="flex items-center justify-center gap-2 group py-0.5 max-w-[180px] sm:max-w-none">
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex justify-center items-center pointer-events-auto z-10 max-w-[48vw] sm:max-w-none overflow-hidden">
+          <Link href="/" className="flex items-center justify-center gap-2 group py-0.5 max-w-[140px] sm:max-w-none">
             {getImageUrl(headerConfig.iconUrl) ? (
               <img
                 src={getImageUrl(headerConfig.iconUrl)}
@@ -302,11 +302,11 @@ export const Navbar: React.FC = () => {
               <img
                 src={getImageUrl(headerConfig.logoUrl)}
                 alt={headerConfig.brandName || 'SANUSHA'}
-                className="h-6 sm:h-8 w-auto object-contain max-w-[150px] sm:max-w-none"
+                className="h-5 sm:h-8 w-auto object-contain max-w-[120px] sm:max-w-none"
                 onError={() => setLogoError(true)}
               />
             ) : (
-              <span className="font-serif text-lg sm:text-2xl font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#6C307D] transition-colors truncate">
+              <span className="font-serif text-base sm:text-2xl font-bold tracking-[0.12em] sm:tracking-[0.2em] text-gray-900 group-hover:text-[#6C307D] transition-colors truncate">
                 {headerConfig.brandName || 'SANUSHA'}
               </span>
             )}
@@ -422,7 +422,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Action Icons */}
-          <div className="flex items-center gap-2.5 text-gray-700">
+          <div className="flex items-center gap-1.5 sm:gap-3 text-gray-700 shrink-0">
             <Link
               href={customerUser ? '/account' : '/login'}
               className="hover:text-[#6C307D] transition-colors p-0.5 hover:bg-slate-100 rounded-full flex items-center justify-center shrink-0"
@@ -433,14 +433,14 @@ export const Navbar: React.FC = () => {
                   src={customerUser.picture}
                   alt={customerUser.name}
                   referrerPolicy="no-referrer"
-                  className="w-7 h-7 min-w-[28px] min-h-[28px] rounded-full object-cover object-center aspect-square shrink-0 border-2 border-[#6C307D] shadow-2xs"
+                  className="w-6 h-6 sm:w-7 sm:h-7 min-w-[24px] sm:min-w-[28px] min-h-[24px] sm:min-h-[28px] rounded-full object-cover object-center aspect-square shrink-0 border border-[#6C307D] shadow-2xs"
                 />
               ) : customerUser?.name ? (
-                <div className="w-7 h-7 min-w-[28px] min-h-[28px] rounded-full bg-[#6C307D] text-white text-[11px] font-bold flex items-center justify-center aspect-square shrink-0 shadow-2xs">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 min-w-[24px] sm:min-w-[28px] min-h-[24px] sm:min-h-[28px] rounded-full bg-[#6C307D] text-white text-[10px] sm:text-[11px] font-bold flex items-center justify-center aspect-square shrink-0 shadow-2xs">
                   {customerUser.name.charAt(0).toUpperCase()}
                 </div>
               ) : (
-                <User className="w-4.5 h-4.5" />
+                <User className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               )}
             </Link>
 
