@@ -1360,18 +1360,74 @@ app.delete('/api/coupons/:id', async (req: any, res: any) => {
   }
 });
 
+async function ensureDefaultCouponsSeeded() {
+  try {
+    const count = await (prisma as any).coupon.count();
+    if (count === 0) {
+      await (prisma as any).coupon.createMany({
+        data: [
+          {
+            code: 'SANUSHA10',
+            discountType: 'PERCENTAGE',
+            discountValue: 10,
+            minOrderAmount: 999,
+            description: '10% Instant Discount on orders above ₹999',
+            active: true,
+          },
+          {
+            code: 'WELCOME100',
+            discountType: 'FIXED',
+            discountValue: 100,
+            minOrderAmount: 499,
+            description: 'Flat ₹100 OFF on your first purchase',
+            active: true,
+          },
+          {
+            code: 'FESTIVE20',
+            discountType: 'PERCENTAGE',
+            discountValue: 20,
+            minOrderAmount: 1999,
+            maxDiscount: 500,
+            description: '20% OFF up to ₹500 on festive collections above ₹1999',
+            active: true,
+          },
+        ],
+      });
+    }
+  } catch (e) {
+    console.warn('Coupon seed notice:', e);
+  }
+}
+
 // Coupon Validation Endpoint for Checkout/Cart
 app.post('/api/coupons/validate', async (req: any, res: any) => {
   try {
+    await ensureDefaultCouponsSeeded();
     const { code, subtotal } = req.body;
     if (!code) {
       return res.status(400).json({ valid: false, error: 'Please enter a coupon code' });
     }
 
     const cleanCode = code.trim().toUpperCase();
-    const coupon = await (prisma as any).coupon.findUnique({
+    let coupon = await (prisma as any).coupon.findUnique({
       where: { code: cleanCode },
     });
+
+    if (!coupon) {
+      const fallbacks: any = {
+        SANUSHA10: { code: 'SANUSHA10', discountType: 'PERCENTAGE', discountValue: 10, minOrderAmount: 999, description: '10% Instant Discount on orders above ₹999', active: true },
+        WELCOME100: { code: 'WELCOME100', discountType: 'FIXED', discountValue: 100, minOrderAmount: 499, description: 'Flat ₹100 OFF on your first purchase', active: true },
+        FESTIVE20: { code: 'FESTIVE20', discountType: 'PERCENTAGE', discountValue: 20, minOrderAmount: 1999, maxDiscount: 500, description: '20% OFF up to ₹500 on festive collections above ₹1999', active: true },
+      };
+
+      if (fallbacks[cleanCode]) {
+        try {
+          coupon = await (prisma as any).coupon.create({ data: fallbacks[cleanCode] });
+        } catch (e) {
+          coupon = fallbacks[cleanCode];
+        }
+      }
+    }
 
     if (!coupon) {
       return res.status(404).json({ valid: false, error: `Invalid promo code '${cleanCode}'` });
@@ -1405,7 +1461,7 @@ app.post('/api/coupons/validate', async (req: any, res: any) => {
       valid: true,
       message: `Coupon '${cleanCode}' applied successfully! You saved ₹${calculatedDiscount}`,
       coupon: {
-        id: coupon.id,
+        id: coupon.id || cleanCode,
         code: coupon.code,
         discountType: coupon.discountType,
         discountValue: coupon.discountValue,

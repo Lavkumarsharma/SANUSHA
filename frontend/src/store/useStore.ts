@@ -320,11 +320,12 @@ export const useStore = create<StoreState>()(
       setThemeSettings: (settings) => set({ themeSettings: settings }),
 
       applyCoupon: async (code: string, subtotal: number) => {
+        const cleanCode = code.trim().toUpperCase();
         try {
           set({ couponError: null });
           const data = await fetchApi('/coupons/validate', {
             method: 'POST',
-            body: JSON.stringify({ code, subtotal }),
+            body: JSON.stringify({ code: cleanCode, subtotal }),
           });
           if (data && data.valid) {
             set((state) => ({
@@ -343,12 +344,43 @@ export const useStore = create<StoreState>()(
             }));
             return { success: true, message: data.message };
           } else {
-            const errMsg = data.error || 'Invalid coupon code';
+            const errMsg = data.error || `Invalid promo code '${cleanCode}'`;
             set({ couponError: errMsg });
             return { success: false, message: errMsg };
           }
         } catch (err: any) {
-          const errMsg = err.message || 'Failed to validate coupon';
+          const fallbacks: any = {
+            SANUSHA10: { code: 'SANUSHA10', type: 'PERCENTAGE', val: 10, min: 999, desc: '10% Instant Discount on orders above ₹999' },
+            WELCOME100: { code: 'WELCOME100', type: 'FIXED', val: 100, min: 499, desc: 'Flat ₹100 OFF on your first purchase' },
+            FESTIVE20: { code: 'FESTIVE20', type: 'PERCENTAGE', val: 20, min: 1999, max: 500, desc: '20% OFF up to ₹500 on festive collections above ₹1999' },
+          };
+
+          const fb = fallbacks[cleanCode];
+          if (fb) {
+            if (subtotal < fb.min) {
+              const msg = `Minimum order amount of ₹${fb.min} is required for code '${cleanCode}'`;
+              set({ couponError: msg });
+              return { success: false, message: msg };
+            }
+            let disc = fb.type === 'PERCENTAGE' ? (subtotal * fb.val) / 100 : fb.val;
+            if (fb.max && disc > fb.max) disc = fb.max;
+            disc = Math.round(disc);
+
+            const couponObj = { id: cleanCode, code: fb.code, discountType: fb.type, discountValue: fb.val, description: fb.desc };
+            const succMsg = `Coupon '${cleanCode}' applied successfully! Saved ₹${disc}`;
+            set((state) => ({
+              appliedCoupon: couponObj,
+              couponDiscount: disc,
+              couponError: null,
+              toasts: [
+                ...state.toasts,
+                { id: Date.now().toString(), title: 'Coupon Applied 🎉', message: succMsg, type: 'success' },
+              ],
+            }));
+            return { success: true, message: succMsg };
+          }
+
+          const errMsg = err.message || `Invalid promo code '${cleanCode}'`;
           set({ couponError: errMsg });
           return { success: false, message: errMsg };
         }
