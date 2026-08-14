@@ -27,6 +27,7 @@ export const Navbar: React.FC = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [customerUser, setCustomerUser] = useState<any>(null);
+  const [logoError, setLogoError] = useState(false);
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -297,12 +298,12 @@ export const Navbar: React.FC = () => {
               />
             ) : null}
 
-            {getImageUrl(headerConfig.logoUrl) ? (
+            {!logoError && getImageUrl(headerConfig.logoUrl) ? (
               <img
                 src={getImageUrl(headerConfig.logoUrl)}
-                alt={headerConfig.brandName}
+                alt={headerConfig.brandName || 'SANUSHA'}
                 className="h-7 sm:h-8 w-auto object-contain"
-                onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                onError={() => setLogoError(true)}
               />
             ) : (
               <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.22em] text-gray-900 group-hover:text-[#6C307D] transition-colors">

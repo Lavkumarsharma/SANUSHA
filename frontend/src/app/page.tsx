@@ -174,11 +174,13 @@ export default function StorefrontHomePage() {
 
       <main className="flex-grow">
         {/* Dynamic 100% Edge-to-Edge Full Hero Carousel Container */}
-        <section className="relative w-full aspect-[16/9] min-h-[420px] max-h-[85vh] bg-slate-950 overflow-hidden">
+        <section className="relative w-full aspect-[16/9] min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden">
           {heroSlides.map((slide, idx) => {
             const isCurrent = idx === currentSlideIdx;
             const hasTextContent = (slide.title?.trim() || slide.subtitle?.trim() || slide.badgeText?.trim());
             const shouldShowOverlay = slide.showOverlay !== false && hasTextContent;
+            const desktopImgSrc = getImageUrl(slide.bannerUrl) || '/images/decor_hero_banner.jpg';
+            const mobileImgSrc = slide.mobileBannerUrl ? (getImageUrl(slide.mobileBannerUrl) || desktopImgSrc) : '';
 
             return (
               <div
@@ -189,25 +191,31 @@ export default function StorefrontHomePage() {
               >
                 {/* Desktop Banner Image */}
                 <img
-                  src={getImageUrl(slide.bannerUrl) || '/images/decor_hero_banner.jpg'}
+                  src={desktopImgSrc}
                   alt={slide.title || 'SANUSHA Hero Banner'}
                   className={`w-full h-full object-cover object-center transition-transform duration-700 ${
-                    slide.mobileBannerUrl ? 'hidden sm:block' : 'block'
+                    mobileImgSrc ? 'hidden sm:block' : 'block'
                   }`}
                   style={{ imageRendering: 'auto' as any }}
                   loading="eager"
                   fetchPriority="high"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/images/decor_hero_banner.jpg';
+                  }}
                 />
 
                 {/* Dedicated Mobile Phone Banner Image */}
-                {slide.mobileBannerUrl && (
+                {mobileImgSrc && (
                   <img
-                    src={getImageUrl(slide.mobileBannerUrl)}
+                    src={mobileImgSrc}
                     alt={slide.title || 'SANUSHA Mobile Hero Banner'}
                     className="block sm:hidden w-full h-full object-cover object-center transition-transform duration-700"
                     style={{ imageRendering: 'auto' as any }}
                     loading="eager"
                     fetchPriority="high"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/images/decor_hero_banner.jpg';
+                    }}
                   />
                 )}
 
