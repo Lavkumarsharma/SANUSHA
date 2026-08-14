@@ -396,6 +396,50 @@ app.delete('/api/media/:id', authenticate, async (req: any, res: any) => {
 // ----------------------------------------------------
 // 3. PRODUCTS API WITH DISTINCT IMAGES MAPPING
 // ----------------------------------------------------
+function parseGalleryImages(product: any): string[] {
+  let list: string[] = [];
+
+  if (product.galleryImages) {
+    if (Array.isArray(product.galleryImages)) {
+      list = product.galleryImages;
+    } else if (typeof product.galleryImages === 'string') {
+      try {
+        const parsed = JSON.parse(product.galleryImages);
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+      } catch (e) {
+        if (product.galleryImages.length > 0) list = [product.galleryImages];
+      }
+    }
+  }
+
+  if (list.length === 0 && product.images) {
+    if (Array.isArray(product.images)) {
+      list = product.images;
+    } else if (typeof product.images === 'string') {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+      } catch (e) {
+        if (product.images.length > 0) list = [product.images];
+      }
+    }
+  }
+
+  if (list.length === 0 && product.image) {
+    list = [product.image];
+  }
+
+  if (list.length === 0) {
+    list = [resolveDistinctProductImage(product.name)];
+  }
+
+  if (product.image && !list.includes(product.image)) {
+    list.unshift(product.image);
+  }
+
+  return list;
+}
+
 app.get('/api/products', async (req: any, res: any) => {
   try {
     await ensureDefaultDataSeeded();
@@ -425,11 +469,13 @@ app.get('/api/products', async (req: any, res: any) => {
     });
 
     const mappedProducts = products.map((p) => {
-      const distinctImage = p.image || (p as any).images?.[0] || resolveDistinctProductImage(p.name);
+      const parsedGallery = parseGalleryImages(p);
+      const mainImage = p.image || parsedGallery[0] || resolveDistinctProductImage(p.name);
       return {
         ...p,
-        image: distinctImage,
-        images: Array.isArray((p as any).images) && (p as any).images.length > 0 ? (p as any).images : [distinctImage],
+        image: mainImage,
+        images: parsedGallery,
+        galleryImages: parsedGallery,
       };
     });
 
@@ -446,11 +492,13 @@ app.get('/api/products/:id', async (req: any, res: any) => {
       include: { category: true, collection: true, variants: true },
     });
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    const distinctImage = product.image || (product as any).images?.[0] || resolveDistinctProductImage(product.name);
+    const parsedGallery = parseGalleryImages(product);
+    const mainImage = product.image || parsedGallery[0] || resolveDistinctProductImage(product.name);
     res.json({
       ...product,
-      image: distinctImage,
-      images: [distinctImage],
+      image: mainImage,
+      images: parsedGallery,
+      galleryImages: parsedGallery,
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

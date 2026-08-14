@@ -93,12 +93,43 @@ export default function ProductDetailPage() {
   };
 
   const isWishlisted = Array.isArray(wishlist) && wishlist.includes(product.id);
-  const gallery =
-    Array.isArray(product.galleryImages) && product.galleryImages.length > 0
-      ? product.galleryImages
-      : Array.isArray(product.images) && product.images.length > 0
-      ? product.images
-      : [product.image || '/images/prod_lantern_1.jpg'];
+  const parseFrontendGallery = (p: any): string[] => {
+    if (!p) return ['/images/prod_lantern_1.jpg'];
+    let list: string[] = [];
+
+    if (Array.isArray(p.galleryImages) && p.galleryImages.length > 0) {
+      list = p.galleryImages;
+    } else if (typeof p.galleryImages === 'string') {
+      try {
+        const parsed = JSON.parse(p.galleryImages);
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+      } catch (e) {}
+    }
+
+    if (list.length === 0) {
+      if (Array.isArray(p.images) && p.images.length > 0) {
+        list = p.images;
+      } else if (typeof p.images === 'string') {
+        try {
+          const parsed = JSON.parse(p.images);
+          if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+        } catch (e) {}
+      }
+    }
+
+    if (list.length === 0 && p.image) {
+      list = [p.image];
+    }
+
+    if (list.length === 0) {
+      list = ['/images/prod_lantern_1.jpg'];
+    }
+
+    return list;
+  };
+
+  const gallery = parseFrontendGallery(product);
+  const getImageUrl = (url: string) => (url?.startsWith('http') ? url : url);
 
   const colorName =
     ((product as any).colors && (product as any).colors[selectedColorIndex]) || 'Warm Teak';
@@ -118,8 +149,8 @@ export default function ProductDetailPage() {
 
       <main className="flex-grow">
         {/* Breadcrumb Bar */}
-        <div className="bg-[#FAF8F5] border-b border-[#EBE7DF] py-3 px-4 sm:px-8 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          <div className="max-w-7xl mx-auto flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-2 text-xs font-medium text-gray-500">
+          <div className="flex items-center gap-2">
             <Link href="/" className="hover:text-[#6C307D] transition-colors">
               Home
             </Link>
@@ -155,7 +186,7 @@ export default function ProductDetailPage() {
                   }`}
                 >
                   <img
-                    src={imgUrl}
+                    src={getImageUrl(imgUrl)}
                     alt={`Thumbnail ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -176,7 +207,7 @@ export default function ProductDetailPage() {
 
               {/* Main Image */}
               <img
-                src={gallery[selectedImageIndex] || product.image}
+                src={getImageUrl(gallery[selectedImageIndex] || product.image)}
                 alt={product.name}
                 className="w-full h-full object-cover object-center transition-all duration-300"
               />
