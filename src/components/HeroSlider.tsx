@@ -19,11 +19,11 @@ const SLIDES: Slide[] = [
   {
     id: 1,
     tagline: 'HANDCRAFTED LUXURY',
-    titleLine1: 'CRAFTED FOR',
-    titleLine2: 'BEAUTIFUL SPACES.',
-    subtitle: 'Timeless décor. Handcrafted with care. Made to bring warmth, meaning and elegance.',
+    titleLine1: 'CRAFTED WITH',
+    titleLine2: 'MEANING.',
+    subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
     ctaText: 'EXPLORE COLLECTION',
-    ctaLink: '#collections',
+    ctaLink: '/shop',
     image: '/images/decor_hero_banner.jpg',
   },
 ];
