@@ -14,7 +14,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const defaultMongoUrl = 'mongodb+srv://sanusha_user:Sanusha2026Pass@cluster0.mongodb.net/sanusha_db?retryWrites=true&w=majority';
+const defaultMongoUrl = 'mongodb+srv://lawkumar0000000556588_db_user:CyShoNKD3Un96FJn@sanusha.vlwhq7a.mongodb.net/sanusha?retryWrites=true&w=majority';
 const activeDbUrl = process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('mongo')
   ? process.env.DATABASE_URL
   : defaultMongoUrl;
