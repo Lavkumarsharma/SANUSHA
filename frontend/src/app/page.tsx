@@ -187,15 +187,29 @@ export default function StorefrontHomePage() {
                   isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
                 }`}
               >
-                {/* 100% Full Cover Image filling exact hero dimensions in original high quality */}
+                {/* Desktop Banner Image */}
                 <img
-                  src={getImageUrl(slide.bannerUrl) || '/images/hero_banner.jpg'}
+                  src={getImageUrl(slide.bannerUrl) || '/images/decor_hero_banner.jpg'}
                   alt={slide.title || 'SANUSHA Hero Banner'}
-                  className="w-full h-full object-cover object-top sm:object-center transition-transform duration-700"
+                  className={`w-full h-full object-cover object-center transition-transform duration-700 ${
+                    slide.mobileBannerUrl ? 'hidden sm:block' : 'block'
+                  }`}
                   style={{ imageRendering: 'auto' as any }}
                   loading="eager"
                   fetchPriority="high"
                 />
+
+                {/* Dedicated Mobile Phone Banner Image */}
+                {slide.mobileBannerUrl && (
+                  <img
+                    src={getImageUrl(slide.mobileBannerUrl)}
+                    alt={slide.title || 'SANUSHA Mobile Hero Banner'}
+                    className="block sm:hidden w-full h-full object-cover object-center transition-transform duration-700"
+                    style={{ imageRendering: 'auto' as any }}
+                    loading="eager"
+                    fetchPriority="high"
+                  />
+                )}
 
                 {/* Render Text Overlay ONLY IF showOverlay is TRUE and text exists */}
                 {shouldShowOverlay && (

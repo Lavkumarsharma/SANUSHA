@@ -376,7 +376,7 @@ export default function CMSPageBuilderPage() {
   // Cropper Modal State
   const [cropModalData, setCropModalData] = useState<{
     src: string;
-    targetField: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide';
+    targetField: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide' | 'mobileHeroSlide';
     sectionIndex?: number;
     slideIndex?: number;
   } | null>(null);
@@ -595,7 +595,7 @@ export default function CMSPageBuilderPage() {
   // Direct High-Res Original File Upload without Crop
   const handleUploadOriginalFile = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide',
+    field: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide' | 'mobileHeroSlide',
     sectionIndex?: number,
     slideIndex?: number
   ) => {
@@ -609,6 +609,9 @@ export default function CMSPageBuilderPage() {
       if (base64Url) {
         if (field === 'heroSlide' && typeof slideIndex === 'number') {
           handleUpdateHeroSlide(slideIndex, 'bannerUrl', base64Url);
+        }
+        if (field === 'mobileHeroSlide' && typeof slideIndex === 'number') {
+          handleUpdateHeroSlide(slideIndex, 'mobileBannerUrl', base64Url);
         }
         if (field === 'icon') setHeaderConfig((prev) => ({ ...prev, iconUrl: base64Url }));
         if (field === 'logo') setHeaderConfig((prev) => ({ ...prev, logoUrl: base64Url }));
@@ -643,6 +646,9 @@ export default function CMSPageBuilderPage() {
         if (field === 'heroSlide' && typeof slideIndex === 'number') {
           handleUpdateHeroSlide(slideIndex, 'bannerUrl', data.url);
         }
+        if (field === 'mobileHeroSlide' && typeof slideIndex === 'number') {
+          handleUpdateHeroSlide(slideIndex, 'mobileBannerUrl', data.url);
+        }
         if (field === 'icon') setHeaderConfig((prev) => ({ ...prev, iconUrl: data.url }));
         if (field === 'logo') setHeaderConfig((prev) => ({ ...prev, logoUrl: data.url }));
         if (field === 'megaBanner') {
@@ -665,7 +671,7 @@ export default function CMSPageBuilderPage() {
   // Upload Base64 Cropped Image
   const uploadCroppedImage = async (
     base64: string,
-    field: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide',
+    field: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide' | 'mobileHeroSlide',
     sectionIndex?: number,
     slideIndex?: number
   ) => {
@@ -681,6 +687,9 @@ export default function CMSPageBuilderPage() {
       }
       if (field === 'heroSlide' && typeof slideIndex === 'number') {
         handleUpdateHeroSlide(slideIndex, 'bannerUrl', base64);
+      }
+      if (field === 'mobileHeroSlide' && typeof slideIndex === 'number') {
+        handleUpdateHeroSlide(slideIndex, 'mobileBannerUrl', base64);
       }
       if (field === 'section' && typeof sectionIndex === 'number') {
         handleUpdateSection(sectionIndex, 'bannerUrl', base64);
@@ -714,6 +723,9 @@ export default function CMSPageBuilderPage() {
         if (field === 'heroSlide' && typeof slideIndex === 'number') {
           handleUpdateHeroSlide(slideIndex, 'bannerUrl', data.url);
         }
+        if (field === 'mobileHeroSlide' && typeof slideIndex === 'number') {
+          handleUpdateHeroSlide(slideIndex, 'mobileBannerUrl', data.url);
+        }
         if (field === 'section' && typeof sectionIndex === 'number') {
           handleUpdateSection(sectionIndex, 'bannerUrl', data.url);
         }
@@ -728,7 +740,7 @@ export default function CMSPageBuilderPage() {
 
   const handleSelectFileForCropper = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide',
+    field: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide' | 'mobileHeroSlide',
     sectionIndex?: number,
     slideIndex?: number
   ) => {
@@ -1033,39 +1045,101 @@ export default function CMSPageBuilderPage() {
               {/* Slide Content Editors */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
                 
-                {/* Slide Background Image Uploader */}
-                <div className="md:col-span-5 space-y-2">
-                  <label className="block font-bold text-slate-800">Slide Background Banner Image</label>
-                  <div className="relative aspect-[16/9] bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shadow-2xs group">
-                    <img src={getImageUrl(slide.bannerUrl)} alt="Slide Preview" className="w-full h-full object-cover" />
-                    
-                    <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 text-white">
-                      <label className="cursor-pointer bg-[#6C307D] hover:bg-[#522061] text-white font-bold text-[10px] px-3 py-2 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
-                        <Crop className="w-3.5 h-3.5" />
-                        <span>Precision Ratio Crop</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleSelectFileForCropper(e, 'heroSlide', undefined, sIdx)}
-                          className="hidden"
-                        />
-                      </label>
-
-                      <label className="cursor-pointer bg-slate-700 hover:bg-slate-800 text-white font-bold text-[10px] px-3 py-2 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>Upload 100% Original File</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleUploadOriginalFile(e, 'heroSlide', undefined, sIdx)}
-                          className="hidden"
-                        />
+                {/* Slide Background Images (Desktop & Mobile Dedicated) */}
+                <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-4 pb-2 border-b border-slate-200">
+                  {/* Desktop Banner Image Uploader */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="block font-bold text-slate-800 text-xs uppercase tracking-wider">
+                        🖥️ Desktop Banner Image (16:9 Landscape)
                       </label>
                     </div>
+                    <div className="relative aspect-[16/9] bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shadow-2xs group">
+                      <img src={getImageUrl(slide.bannerUrl)} alt="Desktop Slide Preview" className="w-full h-full object-cover" />
+                      
+                      <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 text-white">
+                        <label className="cursor-pointer bg-[#6C307D] hover:bg-[#522061] text-white font-bold text-[10px] px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
+                          <Crop className="w-3.5 h-3.5" />
+                          <span>Crop 16:9 Desktop</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleSelectFileForCropper(e, 'heroSlide', undefined, sIdx)}
+                            className="hidden"
+                          />
+                        </label>
+
+                        <label className="cursor-pointer bg-slate-700 hover:bg-slate-800 text-white font-bold text-[10px] px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload Original File</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUploadOriginalFile(e, 'heroSlide', undefined, sIdx)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-slate-500 font-medium">
+                      Recommended: 16:9 aspect ratio image for laptops and wide monitors.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-medium">
-                    Recommended: Click <b>"Precision Ratio Crop"</b> to snap to exact <b>16:9 Hero</b> or <b>21:9 Ultrawide</b> proportions!
-                  </p>
+
+                  {/* Mobile Dedicated Banner Image Uploader */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="block font-bold text-[#6C307D] text-xs uppercase tracking-wider flex items-center gap-1">
+                        📱 Mobile Phone Banner Image (Portrait 3:4 / 9:16)
+                      </label>
+                      {slide.mobileBannerUrl && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateHeroSlide(sIdx, 'mobileBannerUrl', '')}
+                          className="text-[10px] font-bold text-red-500 hover:underline"
+                        >
+                          Remove Mobile Image
+                        </button>
+                      )}
+                    </div>
+                    <div className="relative aspect-[3/4] max-h-[160px] bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shadow-2xs group flex items-center justify-center">
+                      {slide.mobileBannerUrl ? (
+                        <img src={getImageUrl(slide.mobileBannerUrl)} alt="Mobile Slide Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center p-3 text-slate-400">
+                          <p className="text-[11px] font-bold text-slate-300">No Mobile Image Uploaded</p>
+                          <p className="text-[10px] text-slate-500">Phone will fallback to Desktop image unless uploaded here.</p>
+                        </div>
+                      )}
+                      
+                      <div className="absolute inset-0 bg-slate-900/85 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 text-white">
+                        <label className="cursor-pointer bg-[#6C307D] hover:bg-[#522061] text-white font-bold text-[10px] px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
+                          <Crop className="w-3.5 h-3.5" />
+                          <span>Crop Mobile Aspect Ratio</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleSelectFileForCropper(e, 'mobileHeroSlide', undefined, sIdx)}
+                            className="hidden"
+                          />
+                        </label>
+
+                        <label className="cursor-pointer bg-slate-700 hover:bg-slate-800 text-white font-bold text-[10px] px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload Mobile Photo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUploadOriginalFile(e, 'mobileHeroSlide', undefined, sIdx)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-slate-500 font-medium">
+                      Upload vertical photo designed for iPhone / Android mobile screens!
+                    </p>
+                  </div>
                 </div>
 
                 {/* Text Fields */}

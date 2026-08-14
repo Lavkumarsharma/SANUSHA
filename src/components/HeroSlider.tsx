@@ -13,6 +13,7 @@ interface Slide {
   ctaText: string;
   ctaLink: string;
   image: string;
+  mobileImage?: string;
 }
 
 const SLIDES: Slide[] = [
@@ -45,18 +46,34 @@ export const HeroSlider: React.FC = () => {
       {/* Background Slide Image with next/image priority loading */}
       <div className="absolute inset-0">
         {SLIDES.map((item, idx) => (
-          <Image
-            key={item.id}
-            src={item.image}
-            alt={item.titleLine1}
-            fill
-            priority={idx === 0}
-            sizes="100vw"
-            quality={85}
-            className={`object-cover object-top sm:object-center transition-opacity duration-700 ease-in-out ${
-              idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-          />
+          <React.Fragment key={item.id}>
+            <Image
+              src={item.image}
+              alt={item.titleLine1}
+              fill
+              priority={idx === 0}
+              sizes="100vw"
+              quality={85}
+              className={`object-cover object-top sm:object-center transition-opacity duration-700 ease-in-out ${
+                item.mobileImage ? 'hidden sm:block' : 'block'
+              } ${
+                idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            />
+            {item.mobileImage && (
+              <Image
+                src={item.mobileImage}
+                alt={item.titleLine1}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                quality={85}
+                className={`block sm:hidden object-cover object-center transition-opacity duration-700 ease-in-out ${
+                  idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
+              />
+            )}
+          </React.Fragment>
         ))}
         {/* Soft overlay gradient for perfect text contrast */}
         <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent lg:via-white/30 z-10" />
