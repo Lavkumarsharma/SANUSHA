@@ -1112,7 +1112,14 @@ export default function CMSPageBuilderPage() {
                       </label>
                     </div>
                     <div className="relative aspect-[16/9] bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shadow-2xs group">
-                      <img src={getImageUrl(slide.bannerUrl)} alt="Desktop Slide Preview" className="w-full h-full object-cover" />
+                      <img
+                        src={getImageUrl(slide.bannerUrl) || '/images/hero_banner.jpg'}
+                        alt="Desktop Slide Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = '/images/hero_banner.jpg';
+                        }}
+                      />
                       
                       <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 text-white">
                         <label className="cursor-pointer bg-[#6C307D] hover:bg-[#522061] text-white font-bold text-[10px] px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
@@ -1161,7 +1168,14 @@ export default function CMSPageBuilderPage() {
                     </div>
                     <div className="relative aspect-[3/4] max-h-[160px] bg-slate-900 rounded-lg overflow-hidden border border-slate-300 shadow-2xs group flex items-center justify-center">
                       {slide.mobileBannerUrl ? (
-                        <img src={getImageUrl(slide.mobileBannerUrl)} alt="Mobile Slide Preview" className="w-full h-full object-cover" />
+                        <img
+                          src={getImageUrl(slide.mobileBannerUrl) || '/images/hero_banner.jpg'}
+                          alt="Mobile Slide Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = '/images/hero_banner.jpg';
+                          }}
+                        />
                       ) : (
                         <div className="text-center p-3 text-slate-400">
                           <p className="text-[11px] font-bold text-slate-300">No Mobile Image Uploaded</p>
