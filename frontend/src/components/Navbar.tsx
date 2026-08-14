@@ -288,12 +288,12 @@ export const Navbar: React.FC = () => {
 
         {/* 2. CENTER SECTION: ABSOLUTELY CENTERED BRAND LOGO & NAME */}
         <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex justify-center items-center pointer-events-auto z-10">
-          <Link href="/" className="flex items-center justify-center gap-2 group py-0.5">
+          <Link href="/" className="flex items-center justify-center gap-2 group py-0.5 max-w-[180px] sm:max-w-none">
             {getImageUrl(headerConfig.iconUrl) ? (
               <img
                 src={getImageUrl(headerConfig.iconUrl)}
                 alt="Brand Icon"
-                className="h-7 sm:h-8 w-auto object-contain"
+                className="hidden sm:block h-7 sm:h-8 w-auto object-contain shrink-0"
                 onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
               />
             ) : null}
@@ -302,11 +302,11 @@ export const Navbar: React.FC = () => {
               <img
                 src={getImageUrl(headerConfig.logoUrl)}
                 alt={headerConfig.brandName || 'SANUSHA'}
-                className="h-7 sm:h-8 w-auto object-contain"
+                className="h-6 sm:h-8 w-auto object-contain max-w-[150px] sm:max-w-none"
                 onError={() => setLogoError(true)}
               />
             ) : (
-              <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.22em] text-gray-900 group-hover:text-[#6C307D] transition-colors">
+              <span className="font-serif text-lg sm:text-2xl font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#6C307D] transition-colors truncate">
                 {headerConfig.brandName || 'SANUSHA'}
               </span>
             )}

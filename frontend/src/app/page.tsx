@@ -174,7 +174,7 @@ export default function StorefrontHomePage() {
 
       <main className="flex-grow">
         {/* Dynamic 100% Edge-to-Edge Full Hero Carousel Container */}
-        <section className="relative w-full aspect-[16/9] min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden">
+        <section className="relative w-full aspect-[3/4] sm:aspect-[16/9] min-h-[480px] sm:min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden">
           {heroSlides.map((slide, idx) => {
             const isCurrent = idx === currentSlideIdx;
             const hasTextContent = !!(slide.title?.trim() || slide.subtitle?.trim() || slide.badgeText?.trim());
@@ -193,7 +193,7 @@ export default function StorefrontHomePage() {
                 <img
                   src={desktopImgSrc}
                   alt={slide.title || 'SANUSHA Hero Banner'}
-                  className={`w-full h-full object-cover object-center transition-transform duration-700 ${
+                  className={`w-full h-full object-cover object-top sm:object-center transition-transform duration-700 ${
                     mobileImgSrc ? 'hidden sm:block' : 'block'
                   }`}
                   style={{ imageRendering: 'auto' as any }}
@@ -209,7 +209,7 @@ export default function StorefrontHomePage() {
                   <img
                     src={mobileImgSrc}
                     alt={slide.title || 'SANUSHA Mobile Hero Banner'}
-                    className="block sm:hidden w-full h-full object-cover object-center transition-transform duration-700"
+                    className="block sm:hidden w-full h-full object-cover object-top sm:object-center transition-transform duration-700"
                     style={{ imageRendering: 'auto' as any }}
                     loading="eager"
                     fetchPriority="high"
