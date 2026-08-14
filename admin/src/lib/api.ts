@@ -49,7 +49,7 @@ export function getImageUrl(url: string | undefined | null): string {
   return trimmed;
 }
 
-export async function fetchApi(endpoint: string, options: RequestInit = {}) {
+export async function fetchApi(endpoint: string, options: RequestInit = {}, retries = 2): Promise<any> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('sanusha_token') : null;
   const headers = {
     'Content-Type': 'application/json',
@@ -57,16 +57,24 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `API Error: ${response.statusText}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `API Error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (err: any) {
+    if (retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      return fetchApi(endpoint, options, retries - 1);
+    }
+    throw err;
   }
-
-  return response.json();
 }
 
