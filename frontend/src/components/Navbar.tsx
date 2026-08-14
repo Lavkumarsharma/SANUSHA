@@ -184,12 +184,17 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  const filteredNavItems = (headerConfig.navItems || []).filter((item: any) => {
+    const lbl = item.label?.toUpperCase()?.trim();
+    return lbl !== 'HOME' && lbl !== 'MY ACCOUNT' && lbl !== 'ACCOUNT';
+  });
+
   return (
     <header className="bg-white sticky top-0 z-40 border-b border-[#EBE7DF] shadow-2xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between gap-4 relative">
         
         {/* 1. LEFT SIDE: NAVIGATION LINKS */}
-        <div className="flex-1 flex items-center justify-start min-w-0">
+        <div className="flex items-center justify-start min-w-0 z-10">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="lg:hidden p-1.5 text-gray-700 hover:text-[#6C307D]"
@@ -198,7 +203,7 @@ export const Navbar: React.FC = () => {
           </button>
 
           <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-[11px] font-bold tracking-[0.18em] uppercase text-gray-800">
-            {headerConfig.navItems.map((item: any) => {
+            {filteredNavItems.map((item: any) => {
               if (item.hasDropdown) {
                 return (
                   <div
@@ -280,25 +285,35 @@ export const Navbar: React.FC = () => {
           </nav>
         </div>
 
-        {/* 2. CENTER SECTION: PROPORTIONATE SLEEK BRAND LOGO & NAME */}
-        <div className="flex-1 flex justify-center items-center shrink-0">
+        {/* 2. CENTER SECTION: ABSOLUTELY CENTERED BRAND LOGO & NAME */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex justify-center items-center pointer-events-auto z-10">
           <Link href="/" className="flex items-center justify-center gap-2 group py-0.5">
             {getImageUrl(headerConfig.iconUrl) ? (
-              <img src={getImageUrl(headerConfig.iconUrl)} alt="Brand Icon" className="h-7 sm:h-8 w-auto object-contain" />
+              <img
+                src={getImageUrl(headerConfig.iconUrl)}
+                alt="Brand Icon"
+                className="h-7 sm:h-8 w-auto object-contain"
+                onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+              />
             ) : null}
 
             {getImageUrl(headerConfig.logoUrl) ? (
-              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-7 sm:h-8 w-auto object-contain" />
+              <img
+                src={getImageUrl(headerConfig.logoUrl)}
+                alt={headerConfig.brandName}
+                className="h-7 sm:h-8 w-auto object-contain"
+                onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+              />
             ) : (
               <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.22em] text-gray-900 group-hover:text-[#6C307D] transition-colors">
-                {headerConfig.brandName}
+                {headerConfig.brandName || 'SANUSHA'}
               </span>
             )}
           </Link>
         </div>
 
-        {/* 3. RIGHT SIDE: SEARCH BAR WITH LIVE DISTINCT PRODUCT PREVIEW OVERLAY */}
-        <div className="flex-1 flex items-center justify-end gap-3 sm:gap-4 shrink-0">
+        {/* 3. RIGHT SIDE: SEARCH BAR & USER ACTIONS */}
+        <div className="flex items-center justify-end gap-3 sm:gap-4 shrink-0 z-10">
           {/* Predictive Search Input */}
           <div className="relative hidden md:block" ref={searchRef}>
             <form onSubmit={handleSearchSubmit} className="relative">
