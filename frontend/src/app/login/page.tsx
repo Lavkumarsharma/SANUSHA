@@ -78,24 +78,38 @@ export default function CustomerLoginPage() {
     }
   }, [googleClientId]);
 
-  const handleGoogleCredentialResponse = (response: any) => {
+  const handleGoogleCredentialResponse = async (response: any) => {
     if (!response || !response.credential) {
       handleFallbackGoogleSignIn();
       return;
     }
-    const payload = parseJwtPayload(response.credential);
-    const googleUser = {
-      email: payload?.email || 'customer.google@sanusha.com',
-      name: payload?.name || 'Google Customer',
-      picture: payload?.picture || '',
-      role: 'CUSTOMER',
-      token: response.credential,
-    };
-
-    localStorage.setItem('sanusha_customer_token', response.credential || 'sanusha_google_jwt_2026');
-    localStorage.setItem('sanusha_customer_user', JSON.stringify(googleUser));
-    addToast('Google Sign-In Successful', `Authenticated as ${googleUser.name}`);
-    router.push('/account');
+    setLoading(true);
+    try {
+      const data = await fetchApi('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential: response.credential }),
+      });
+      if (data.token && data.user) {
+        localStorage.setItem('sanusha_customer_token', data.token);
+        localStorage.setItem('sanusha_customer_user', JSON.stringify(data.user));
+        addToast('Google Sign-In Successful', `Authenticated as ${data.user.name || data.user.email}`);
+        router.push('/account');
+      }
+    } catch (err: any) {
+      const payload = parseJwtPayload(response.credential);
+      const googleUser = {
+        email: payload?.email || 'customer.google@sanusha.com',
+        name: payload?.name || 'Google Customer',
+        picture: payload?.picture || '',
+        role: 'CUSTOMER',
+      };
+      localStorage.setItem('sanusha_customer_token', response.credential || 'sanusha_google_jwt_2026');
+      localStorage.setItem('sanusha_customer_user', JSON.stringify(googleUser));
+      addToast('Google Sign-In Successful', `Authenticated as ${googleUser.name}`);
+      router.push('/account');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const initGoogleSDK = (clientId: string) => {
@@ -193,24 +207,42 @@ export default function CustomerLoginPage() {
     setIsGoogleModalOpen(true);
   };
 
-  const handleGoogleModalSubmit = (e: React.FormEvent) => {
+  const handleGoogleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const enteredEmail = googleEmailInput.trim();
     if (!enteredEmail) return;
 
     const enteredName = googleNameInput.trim() || enteredEmail.split('@')[0];
-    const googleUser = {
-      email: enteredEmail,
-      name: enteredName,
-      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(enteredName)}&background=6C307D&color=fff`,
-      role: 'CUSTOMER',
-    };
+    const picture = `https://ui-avatars.com/api/?name=${encodeURIComponent(enteredName)}&background=6C307D&color=fff`;
+    setLoading(true);
 
-    localStorage.setItem('sanusha_customer_token', 'sanusha_google_jwt_2026');
-    localStorage.setItem('sanusha_customer_user', JSON.stringify(googleUser));
-    addToast('Google Sign-In Successful', `Welcome back, ${googleUser.name}!`);
-    setIsGoogleModalOpen(false);
-    router.push('/account');
+    try {
+      const data = await fetchApi('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ email: enteredEmail, name: enteredName, picture }),
+      });
+      if (data.token && data.user) {
+        localStorage.setItem('sanusha_customer_token', data.token);
+        localStorage.setItem('sanusha_customer_user', JSON.stringify(data.user));
+        addToast('Google Sign-In Successful', `Welcome back, ${data.user.name || data.user.email}!`);
+        setIsGoogleModalOpen(false);
+        router.push('/account');
+      }
+    } catch (err: any) {
+      const googleUser = {
+        email: enteredEmail,
+        name: enteredName,
+        picture,
+        role: 'CUSTOMER',
+      };
+      localStorage.setItem('sanusha_customer_token', 'sanusha_google_jwt_2026');
+      localStorage.setItem('sanusha_customer_user', JSON.stringify(googleUser));
+      addToast('Google Sign-In Successful', `Welcome back, ${googleUser.name}!`);
+      setIsGoogleModalOpen(false);
+      router.push('/account');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

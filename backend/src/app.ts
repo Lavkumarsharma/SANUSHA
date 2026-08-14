@@ -153,6 +153,7 @@ async function seedCleanCMSSections() {
 }
 
 seedCleanCMSSections();
+ensureDefaultDataSeeded();
 
 // ----------------------------------------------------
 // 1. AUTH API
@@ -212,6 +213,70 @@ app.post('/api/auth/register', async (req: any, res: any) => {
   }
 });
 
+app.post('/api/auth/google', async (req: any, res: any) => {
+  try {
+    const { credential, email, name, picture } = req.body;
+    let targetEmail = email;
+    let targetName = name;
+    let targetPicture = picture;
+
+    // Decode Google JWT ID Token if passed
+    if (credential && typeof credential === 'string') {
+      try {
+        const parts = credential.split('.');
+        if (parts.length === 3) {
+          const base64Url = parts[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
+          if (jsonPayload.email) targetEmail = jsonPayload.email;
+          if (jsonPayload.name) targetName = jsonPayload.name;
+          if (jsonPayload.picture) targetPicture = jsonPayload.picture;
+        }
+      } catch (e) {}
+    }
+
+    if (!targetEmail) {
+      return res.status(400).json({ error: 'Valid Google email is required' });
+    }
+
+    const cleanEmail = targetEmail.trim().toLowerCase();
+    const cleanName = (targetName || cleanEmail.split('@')[0]).trim();
+    const cleanPicture = targetPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=6C307D&color=fff`;
+
+    let user = await prisma.user.findUnique({ where: { email: cleanEmail } });
+    if (!user) {
+      const randomPassword = await bcrypt.hash('google_oauth_' + Math.random().toString(36), 10);
+      user = await prisma.user.create({
+        data: {
+          email: cleanEmail,
+          name: cleanName,
+          password: randomPassword,
+          role: 'CUSTOMER',
+        },
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role, name: user.name, picture: cleanPicture },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        picture: cleanPicture,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/auth/me', authenticate, async (req: any, res: any) => {
   res.json({ user: req.user });
 });
@@ -230,43 +295,55 @@ app.get('/api/media', async (req: any, res: any) => {
 
 app.post('/api/media/upload', upload.single('file'), async (req: any, res: any) => {
   try {
-    const hostUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
     if (!req.file) {
       const { imageBase64, filename, altText } = req.body;
       if (imageBase64) {
+        let ext = 'jpg';
+        let mime = 'image/jpeg';
         const matches = imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-        if (!matches || matches.length !== 3) {
-          return res.status(400).json({ error: 'Invalid base64 string' });
-        }
-        const ext = matches[1].split('/')[1] || 'jpg';
-        const fname = 'media-' + Date.now() + '.' + ext;
-        const buffer = Buffer.from(matches[2], 'base64');
-        fs.writeFileSync(path.join(uploadsDir, fname), buffer);
+        if (matches && matches.length === 3) {
+          mime = matches[1];
+          ext = mime.split('/')[1] || 'jpg';
+          const fname = 'media-' + Date.now() + '.' + ext;
+          const buffer = Buffer.from(matches[2], 'base64');
+          try {
+            fs.writeFileSync(path.join(uploadsDir, fname), buffer);
+          } catch (e) {}
 
-        const mediaUrl = `${hostUrl}/uploads/${fname}`;
-        const newMedia = await prisma.mediaItem.create({
-          data: {
-            filename: fname,
-            originalName: filename || fname,
-            mimeType: matches[1],
-            size: buffer.length,
-            url: mediaUrl,
-            altText: altText || 'Uploaded Banner Image',
-          },
-        });
-        return res.status(201).json(newMedia);
+          const newMedia = await prisma.mediaItem.create({
+            data: {
+              filename: fname,
+              originalName: filename || fname,
+              mimeType: mime,
+              size: buffer.length,
+              url: imageBase64, // Store persistent Base64 Data URL in MongoDB
+              altText: altText || 'Uploaded Media Image',
+            },
+          });
+          return res.status(201).json(newMedia);
+        }
+        return res.status(400).json({ error: 'Invalid base64 string format' });
       }
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const mediaUrl = `${hostUrl}/uploads/${req.file.filename}`;
+    // Convert file buffer to base64 Data URL for permanent cloud database storage
+    const filePath = path.join(uploadsDir, req.file.filename);
+    let base64DataUrl = '';
+    try {
+      const fileBuffer = fs.readFileSync(filePath);
+      base64DataUrl = `data:${req.file.mimetype};base64,${fileBuffer.toString('base64')}`;
+    } catch (e) {
+      base64DataUrl = `${process.env.BACKEND_URL || req.protocol + '://' + req.get('host')}/uploads/${req.file.filename}`;
+    }
+
     const mediaItem = await prisma.mediaItem.create({
       data: {
         filename: req.file.filename,
         originalName: req.file.originalname,
         mimeType: req.file.mimetype,
         size: req.file.size,
-        url: mediaUrl,
+        url: base64DataUrl || `/uploads/${req.file.filename}`,
         altText: req.body.altText || req.file.originalname,
       },
     });
@@ -298,6 +375,7 @@ app.delete('/api/media/:id', authenticate, async (req: any, res: any) => {
 // ----------------------------------------------------
 app.get('/api/products', async (req: any, res: any) => {
   try {
+    await ensureDefaultDataSeeded();
     const { category, gender, status, search, sort } = req.query;
     let where: any = {};
 
@@ -324,11 +402,11 @@ app.get('/api/products', async (req: any, res: any) => {
     });
 
     const mappedProducts = products.map((p) => {
-      const distinctImage = resolveDistinctProductImage(p.name, (p as any).images?.[0] || p.image);
+      const distinctImage = p.image || (p as any).images?.[0] || resolveDistinctProductImage(p.name);
       return {
         ...p,
         image: distinctImage,
-        images: [distinctImage],
+        images: Array.isArray((p as any).images) && (p as any).images.length > 0 ? (p as any).images : [distinctImage],
       };
     });
 
@@ -345,7 +423,7 @@ app.get('/api/products/:id', async (req: any, res: any) => {
       include: { category: true, collection: true, variants: true },
     });
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    const distinctImage = resolveDistinctProductImage(product.name, (product as any).images?.[0] || product.image);
+    const distinctImage = product.image || (product as any).images?.[0] || resolveDistinctProductImage(product.name);
     res.json({
       ...product,
       image: distinctImage,
@@ -395,154 +473,298 @@ app.delete('/api/products/:id', authenticate, async (req: any, res: any) => {
 async function ensureDefaultDataSeeded() {
   try {
     const catCount = await prisma.category.count();
-    if (catCount === 0) {
+    const prodCount = await prisma.product.count();
+
+    if (catCount === 0 || prodCount === 0) {
       console.log('🌱 Auto-seeding default SANUSHA categories, products & CMS settings...');
 
-      const decorAccents = await prisma.category.create({
-        data: {
-          name: 'Decor Accents',
-          slug: 'decor-accents',
-          description: 'Artisan ceramic vases and candle lanterns',
-          image: '/images/cat_decor_accents.jpg',
-          isMegaMenu: true,
-          order: 1,
-        },
-      });
-
-      const vasesPlanters = await prisma.category.create({
-        data: {
-          name: 'Vases & Planters',
-          slug: 'vases-planters',
-          description: 'Handmolded terracotta and ceramic vases',
-          image: '/images/prod_ceramic_vase_1.jpg',
-          isMegaMenu: true,
-          order: 2,
-        },
-      });
-
-      const storageBaskets = await prisma.category.create({
-        data: {
-          name: 'Storage & Baskets',
-          slug: 'storage-baskets',
-          description: 'Handwoven natural seagrass baskets',
-          image: '/images/prod_basket_1.jpg',
-          isMegaMenu: true,
-          order: 3,
-        },
-      });
-
-      const wallArt = await prisma.category.create({
-        data: {
-          name: 'Wall & Art',
-          slug: 'wall-art',
-          description: 'Boho macrame wall hangings and tapestries',
-          image: '/images/cat_wall_art.jpg',
-          isMegaMenu: true,
-          order: 4,
-        },
-      });
-
-      await prisma.product.createMany({
-        data: [
-          {
-            name: 'Carved Wooden Lantern',
-            slug: 'carved-wooden-lantern',
-            sku: 'SKU-LANTERN-01',
-            price: 1899,
-            originalPrice: 2499,
-            badge: 'HANDCRAFTED',
-            status: 'PUBLISHED',
-            gender: 'Unisex',
-            categoryId: decorAccents.id,
-            material: 'Mango Wood & Brass Glass',
-            description: 'Hand-carved solid mango wood candle lantern featuring delicate geometric lattice work and brass accents.',
-            detailsBullets: '100% Solid Mango Wood\nGlass Cylinder Included\nBrass Handle',
-            image: '/images/prod_lantern_1.jpg',
-            galleryImages: JSON.stringify([
-              '/images/prod_lantern_1.jpg',
-              '/images/prod_lantern_2.jpg',
-              '/images/prod_lantern_3.jpg',
-            ]),
-            stock: 50,
+      let decorAccents = await prisma.category.findUnique({ where: { slug: 'decor-accents' } });
+      if (!decorAccents) {
+        decorAccents = await prisma.category.create({
+          data: {
+            name: 'Decor Accents',
+            slug: 'decor-accents',
+            description: 'Artisan ceramic vases and candle lanterns',
+            image: '/images/cat_decor_accents.jpg',
+            isMegaMenu: true,
+            order: 1,
           },
-          {
-            name: 'Minimal Ceramic Vase',
-            slug: 'minimal-ceramic-vase',
-            sku: 'SKU-VASE-01',
-            price: 999,
-            originalPrice: 1499,
-            badge: 'BESTSELLER',
-            status: 'PUBLISHED',
-            gender: 'Unisex',
-            categoryId: vasesPlanters.id,
-            material: 'Matte Ceramic Clay',
-            description: 'Contemporary Scandinavian matte ceramic bud vase in warm desert sand tone.',
-            detailsBullets: 'Matte Glazed Finish\nWater Resistant\nHand Crafted',
+        });
+      }
+
+      let vasesPlanters = await prisma.category.findUnique({ where: { slug: 'vases-planters' } });
+      if (!vasesPlanters) {
+        vasesPlanters = await prisma.category.create({
+          data: {
+            name: 'Vases & Planters',
+            slug: 'vases-planters',
+            description: 'Handmolded terracotta and ceramic vases',
             image: '/images/prod_ceramic_vase_1.jpg',
-            galleryImages: JSON.stringify([
-              '/images/prod_ceramic_vase_1.jpg',
-              '/images/prod_ceramic_vase_2.jpg',
-            ]),
-            stock: 45,
+            isMegaMenu: true,
+            order: 2,
           },
-          {
-            name: 'Woven Seagrass Storage Basket',
-            slug: 'woven-seagrass-basket',
-            sku: 'SKU-BASKET-01',
-            price: 1299,
-            originalPrice: 1799,
-            badge: 'ECO FRIENDLY',
-            status: 'PUBLISHED',
-            gender: 'Unisex',
-            categoryId: storageBaskets.id,
-            material: 'Natural Seagrass',
-            description: 'Handwoven sturdy seagrass storage basket with reinforced leather handles.',
-            detailsBullets: 'Natural Fiber\nFoldable Design\nMultipurpose Storage',
-            image: '/images/prod_basket_1.jpg',
-            galleryImages: JSON.stringify(['/images/prod_basket_1.jpg']),
-            stock: 60,
-          },
-          {
-            name: 'Macrame Wall Hanging',
-            slug: 'macrame-wall-hanging',
-            sku: 'SKU-MACRAME-01',
-            price: 1599,
-            originalPrice: 2199,
-            badge: 'NEW ARRIVAL',
-            status: 'PUBLISHED',
-            gender: 'Unisex',
-            categoryId: wallArt.id,
-            material: '100% Organic Cotton Cord',
-            description: 'Bohemian hand-knotted macrame wall tapestry on driftwood rod.',
-            detailsBullets: 'Natural Driftwood Rod\n100% Organic Cotton Cord\nHand Knotted',
-            image: '/images/cat_wall_art.jpg',
-            galleryImages: JSON.stringify(['/images/cat_wall_art.jpg']),
-            stock: 30,
-          },
-        ],
-      }).catch(() => {});
+        });
+      }
 
-      await prisma.themeSetting.upsert({
-        where: { key: 'cms_hero_slides' },
-        update: {},
-        create: {
-          key: 'cms_hero_slides',
-          value: JSON.stringify([
+      let storageBaskets = await prisma.category.findUnique({ where: { slug: 'storage-baskets' } });
+      if (!storageBaskets) {
+        storageBaskets = await prisma.category.create({
+          data: {
+            name: 'Storage & Baskets',
+            slug: 'storage-baskets',
+            description: 'Handwoven natural seagrass baskets',
+            image: '/images/prod_basket_1.jpg',
+            isMegaMenu: true,
+            order: 3,
+          },
+        });
+      }
+
+      let wallArt = await prisma.category.findUnique({ where: { slug: 'wall-art' } });
+      if (!wallArt) {
+        wallArt = await prisma.category.create({
+          data: {
+            name: 'Wall & Art',
+            slug: 'wall-art',
+            description: 'Boho macrame wall hangings and tapestries',
+            image: '/images/cat_wall_art.jpg',
+            isMegaMenu: true,
+            order: 4,
+          },
+        });
+      }
+
+      let topsCategory = await prisma.category.findUnique({ where: { slug: 'tops-shirts' } });
+      if (!topsCategory) {
+        topsCategory = await prisma.category.create({
+          data: {
+            name: 'Tops & Shirts',
+            slug: 'tops-shirts',
+            description: 'Linen button-downs and Cuban collar shirts',
+            image: '/images/pdp_linen_main.jpg',
+            isMegaMenu: true,
+            order: 5,
+          },
+        });
+      }
+
+      let bottomsCategory = await prisma.category.findUnique({ where: { slug: 'trousers-pants' } });
+      if (!bottomsCategory) {
+        bottomsCategory = await prisma.category.create({
+          data: {
+            name: 'Trousers & Pants',
+            slug: 'trousers-pants',
+            description: 'Relaxed linen trousers and parachute cargo pants',
+            image: '/images/prod_cargo_pants.jpg',
+            isMegaMenu: true,
+            order: 6,
+          },
+        });
+      }
+
+      if (prodCount === 0) {
+        await prisma.product.createMany({
+          data: [
             {
-              id: 'slide-1',
-              title: 'CRAFTED WITH MEANING.',
-              subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
-              badgeText: 'HANDCRAFTED LUXURY',
-              bannerUrl: '/images/decor_hero_banner.jpg',
-              mobileBannerUrl: '',
-              buttonText: 'EXPLORE COLLECTION',
-              buttonLink: '/shop',
-              showOverlay: true,
-              active: true,
+              name: 'Oversized Linen Shirt',
+              slug: 'oversized-linen-shirt',
+              sku: 'SKU-LINEN-SHIRT-01',
+              price: 2499,
+              originalPrice: 3299,
+              badge: 'NEW ARRIVAL',
+              status: 'PUBLISHED',
+              gender: 'Men',
+              categoryId: topsCategory.id,
+              material: '100% European Flax Linen',
+              description: 'Relaxed fit Cuban collar linen shirt crafted from 100% natural flax.',
+              detailsBullets: '100% Natural Linen\nCuban Collar\nBreathable Fit',
+              image: '/images/pdp_linen_main.jpg',
+              galleryImages: JSON.stringify([
+                '/images/pdp_linen_main.jpg',
+                '/images/prod_textured_shirt.jpg',
+              ]),
+              stock: 50,
             },
-          ]),
-        },
-      }).catch(() => {});
+            {
+              name: 'Pleated Parachute Pants',
+              slug: 'pleated-parachute-pants',
+              sku: 'SKU-PARACHUTE-01',
+              price: 2999,
+              originalPrice: 3999,
+              badge: 'BESTSELLER',
+              status: 'PUBLISHED',
+              gender: 'Men',
+              categoryId: bottomsCategory.id,
+              material: 'Cotton Nylon Blend',
+              description: 'Modern relaxed utility cargo parachute pants with elastic drawstrings.',
+              detailsBullets: 'Utility Cargo Pockets\nAdjustable Hem Drawstrings\nWide Leg Fit',
+              image: '/images/prod_cargo_pants.jpg',
+              galleryImages: JSON.stringify(['/images/prod_cargo_pants.jpg']),
+              stock: 40,
+            },
+            {
+              name: 'Textured Knit Polo',
+              slug: 'textured-knit-polo',
+              sku: 'SKU-KNIT-POLO-01',
+              price: 1899,
+              originalPrice: 2499,
+              badge: 'NEW ARRIVAL',
+              status: 'PUBLISHED',
+              gender: 'Men',
+              categoryId: topsCategory.id,
+              material: 'Breathable Knit Cotton',
+              description: 'Retro open-weave textured knit polo shirt.',
+              detailsBullets: 'Breathable Knit Weave\nOpen Collar Design\nSoft Touch Cotton',
+              image: '/images/prod_knitted_polo.jpg',
+              galleryImages: JSON.stringify(['/images/prod_knitted_polo.jpg']),
+              stock: 35,
+            },
+            {
+              name: 'Satin Slip Dress',
+              slug: 'satin-slip-dress',
+              sku: 'SKU-SLIP-DRESS-01',
+              price: 3499,
+              originalPrice: 4499,
+              badge: 'LUXURY',
+              status: 'PUBLISHED',
+              gender: 'Women',
+              categoryId: topsCategory.id,
+              material: 'Silk Satin Blend',
+              description: 'Elegant cowl-neck satin slip dress in champagne gold.',
+              detailsBullets: 'Cowl Neck\nAdjustable Straps\nLuxurious Satin Gloss',
+              image: '/images/prod_slip_dress.jpg',
+              galleryImages: JSON.stringify(['/images/prod_slip_dress.jpg']),
+              stock: 25,
+            },
+            {
+              name: 'Linen Co-ord Set',
+              slug: 'linen-coord-set',
+              sku: 'SKU-COORD-SET-01',
+              price: 3999,
+              originalPrice: 4999,
+              badge: 'BESTSELLER',
+              status: 'PUBLISHED',
+              gender: 'Women',
+              categoryId: topsCategory.id,
+              material: 'Pure Organic Linen',
+              description: 'Matching relaxed top and wide-leg trousers linen co-ord set.',
+              detailsBullets: 'Two-Piece Set\nElasticated Waist\n100% Organic Linen',
+              image: '/images/prod_linen_set.jpg',
+              galleryImages: JSON.stringify(['/images/prod_linen_set.jpg']),
+              stock: 30,
+            },
+            {
+              name: 'Ribbed Crop Tank',
+              slug: 'ribbed-crop-tank',
+              sku: 'SKU-RIBBED-TANK-01',
+              price: 999,
+              originalPrice: 1499,
+              badge: 'ESSENTIAL',
+              status: 'PUBLISHED',
+              gender: 'Women',
+              categoryId: topsCategory.id,
+              material: 'Ribbed Stretch Cotton',
+              description: 'Everyday fitted ribbed cotton crop tank top.',
+              detailsBullets: 'Soft Ribbed Knit\nForm-Fitting Cut\nDurable Stretch',
+              image: '/images/prod_ribbed_tank.jpg',
+              galleryImages: JSON.stringify(['/images/prod_ribbed_tank.jpg']),
+              stock: 60,
+            },
+            {
+              name: 'Vintage Graphic Tee',
+              slug: 'vintage-graphic-tee',
+              sku: 'SKU-GRAPHIC-TEE-01',
+              price: 1299,
+              originalPrice: 1799,
+              badge: 'NEW ARRIVAL',
+              status: 'PUBLISHED',
+              gender: 'Unisex',
+              categoryId: topsCategory.id,
+              material: '240 GSM Heavyweight Cotton',
+              description: 'Boxy fit vintage washed graphic print T-shirt.',
+              detailsBullets: 'Heavyweight Cotton\nVintage Wash Finish\nBoxy Oversized Fit',
+              image: '/images/prod_oversized_tee.jpg',
+              galleryImages: JSON.stringify(['/images/prod_oversized_tee.jpg']),
+              stock: 45,
+            },
+            {
+              name: 'Carved Wooden Lantern',
+              slug: 'carved-wooden-lantern',
+              sku: 'SKU-LANTERN-01',
+              price: 1899,
+              originalPrice: 2499,
+              badge: 'HANDCRAFTED',
+              status: 'PUBLISHED',
+              gender: 'Unisex',
+              categoryId: decorAccents.id,
+              material: 'Mango Wood & Brass Glass',
+              description: 'Hand-carved solid mango wood candle lantern featuring delicate geometric lattice work and brass accents.',
+              detailsBullets: '100% Solid Mango Wood\nGlass Cylinder Included\nBrass Handle',
+              image: '/images/prod_lantern_1.jpg',
+              galleryImages: JSON.stringify([
+                '/images/prod_lantern_1.jpg',
+                '/images/prod_lantern_2.jpg',
+                '/images/prod_lantern_3.jpg',
+              ]),
+              stock: 50,
+            },
+            {
+              name: 'Minimal Ceramic Vase',
+              slug: 'minimal-ceramic-vase',
+              sku: 'SKU-VASE-01',
+              price: 999,
+              originalPrice: 1499,
+              badge: 'BESTSELLER',
+              status: 'PUBLISHED',
+              gender: 'Unisex',
+              categoryId: vasesPlanters.id,
+              material: 'Matte Ceramic Clay',
+              description: 'Contemporary Scandinavian matte ceramic bud vase in warm desert sand tone.',
+              detailsBullets: 'Matte Glazed Finish\nWater Resistant\nHand Crafted',
+              image: '/images/prod_ceramic_vase_1.jpg',
+              galleryImages: JSON.stringify([
+                '/images/prod_ceramic_vase_1.jpg',
+                '/images/prod_ceramic_vase_2.jpg',
+              ]),
+              stock: 45,
+            },
+            {
+              name: 'Woven Seagrass Storage Basket',
+              slug: 'woven-seagrass-basket',
+              sku: 'SKU-BASKET-01',
+              price: 1299,
+              originalPrice: 1799,
+              badge: 'ECO FRIENDLY',
+              status: 'PUBLISHED',
+              gender: 'Unisex',
+              categoryId: storageBaskets.id,
+              material: 'Natural Seagrass',
+              description: 'Handwoven sturdy seagrass storage basket with reinforced leather handles.',
+              detailsBullets: 'Natural Fiber\nFoldable Design\nMultipurpose Storage',
+              image: '/images/prod_basket_1.jpg',
+              galleryImages: JSON.stringify(['/images/prod_basket_1.jpg']),
+              stock: 60,
+            },
+            {
+              name: 'Macrame Wall Hanging',
+              slug: 'macrame-wall-hanging',
+              sku: 'SKU-MACRAME-01',
+              price: 1599,
+              originalPrice: 2199,
+              badge: 'NEW ARRIVAL',
+              status: 'PUBLISHED',
+              gender: 'Unisex',
+              categoryId: wallArt.id,
+              material: '100% Organic Cotton Cord',
+              description: 'Bohemian hand-knotted macrame wall tapestry on driftwood rod.',
+              detailsBullets: 'Natural Driftwood Rod\n100% Organic Cotton Cord\nHand Knotted',
+              image: '/images/cat_wall_art.jpg',
+              galleryImages: JSON.stringify(['/images/cat_wall_art.jpg']),
+              stock: 30,
+            },
+          ],
+        });
+      }
     }
   } catch (err) {
     console.error('Auto-seed check failed:', err);

@@ -181,12 +181,8 @@ export default function StorefrontHomePage() {
             const shouldShowOverlay = slide.showOverlay === true && hasTextContent;
             const rawDesktop = slide.bannerUrl || '';
             const rawMobile = slide.mobileBannerUrl || '';
-            const desktopImgSrc = rawDesktop && !rawDesktop.startsWith('/uploads/')
-              ? (getImageUrl(rawDesktop) || '/images/decor_hero_banner.jpg')
-              : '/images/decor_hero_banner.jpg';
-            const mobileImgSrc = rawMobile && !rawMobile.startsWith('/uploads/')
-              ? getImageUrl(rawMobile)
-              : '';
+            const desktopImgSrc = getImageUrl(rawDesktop) || '/images/decor_hero_banner.jpg';
+            const mobileImgSrc = getImageUrl(rawMobile) || '';
 
             return (
               <div

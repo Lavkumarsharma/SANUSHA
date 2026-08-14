@@ -521,22 +521,7 @@ export default function CMSPageBuilderPage() {
       .then(([secs, hdr, ftr, hero]) => {
         if (secs && secs.length > 0) setSections(secs);
         if (hero && Array.isArray(hero) && hero.length > 0) {
-          const cleanedHero = hero.map((slide: any) => {
-            let bUrl = slide.bannerUrl || '';
-            let mbUrl = slide.mobileBannerUrl || '';
-            if (typeof bUrl === 'string' && bUrl.startsWith('/uploads/')) {
-              bUrl = '/images/decor_hero_banner.jpg';
-            }
-            if (typeof mbUrl === 'string' && mbUrl.startsWith('/uploads/')) {
-              mbUrl = '';
-            }
-            return {
-              ...slide,
-              bannerUrl: bUrl,
-              mobileBannerUrl: mbUrl,
-            };
-          });
-          setHeroSlides(cleanedHero);
+          setHeroSlides(hero);
         }
         if (hdr && hdr.brandName) {
           setHeaderConfig((prev) => ({

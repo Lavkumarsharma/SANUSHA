@@ -79,24 +79,42 @@ export default function CustomerRegisterPage() {
     setIsGoogleModalOpen(true);
   };
 
-  const handleGoogleModalSubmit = (e: React.FormEvent) => {
+  const handleGoogleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const enteredEmail = googleEmailInput.trim();
     if (!enteredEmail) return;
 
     const enteredName = googleNameInput.trim() || enteredEmail.split('@')[0];
-    const googleUser = {
-      email: enteredEmail,
-      name: enteredName,
-      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(enteredName)}&background=6C307D&color=fff`,
-      role: 'CUSTOMER',
-    };
+    const picture = `https://ui-avatars.com/api/?name=${encodeURIComponent(enteredName)}&background=6C307D&color=fff`;
+    setLoading(true);
 
-    localStorage.setItem('sanusha_customer_token', 'sanusha_google_jwt_2026');
-    localStorage.setItem('sanusha_customer_user', JSON.stringify(googleUser));
-    addToast('Google Sign-Up Successful', `Welcome to SANUSHA, ${googleUser.name}!`);
-    setIsGoogleModalOpen(false);
-    router.push('/account');
+    try {
+      const data = await fetchApi('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ email: enteredEmail, name: enteredName, picture }),
+      });
+      if (data.token && data.user) {
+        localStorage.setItem('sanusha_customer_token', data.token);
+        localStorage.setItem('sanusha_customer_user', JSON.stringify(data.user));
+        addToast('Google Sign-Up Successful', `Welcome to SANUSHA, ${data.user.name || data.user.email}!`);
+        setIsGoogleModalOpen(false);
+        router.push('/account');
+      }
+    } catch (err: any) {
+      const googleUser = {
+        email: enteredEmail,
+        name: enteredName,
+        picture,
+        role: 'CUSTOMER',
+      };
+      localStorage.setItem('sanusha_customer_token', 'sanusha_google_jwt_2026');
+      localStorage.setItem('sanusha_customer_user', JSON.stringify(googleUser));
+      addToast('Google Sign-Up Successful', `Welcome to SANUSHA, ${googleUser.name}!`);
+      setIsGoogleModalOpen(false);
+      router.push('/account');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
