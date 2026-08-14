@@ -70,20 +70,21 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-white text-slate-700 h-screen sticky top-0 overflow-y-auto flex flex-col justify-between p-4 border-r border-slate-200 shrink-0 shadow-xs z-40">
       <div className="space-y-6">
-        {/* Brand Header with Live Logo Sync (Purple 'S' box removed) */}
+        {/* Brand Header with Live Logo Sync */}
         <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-100">
           {getImageUrl(headerConfig.iconUrl) ? (
-            <img src={getImageUrl(headerConfig.iconUrl)} alt="Icon" className="w-7 h-7 object-contain rounded shrink-0" />
+            <img
+              src={getImageUrl(headerConfig.iconUrl)}
+              alt="Icon"
+              className="w-7 h-7 object-contain rounded shrink-0"
+              onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+            />
           ) : null}
 
           <div className="min-w-0 flex-1">
-            {getImageUrl(headerConfig.logoUrl) ? (
-              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-7 w-auto object-contain" />
-            ) : (
-              <h1 className="font-bold text-slate-900 tracking-[0.2em] text-base truncate font-serif">
-                {headerConfig.brandName}
-              </h1>
-            )}
+            <h1 className="font-bold text-slate-900 tracking-[0.2em] text-base truncate font-serif">
+              {headerConfig.brandName || 'SANUSHA'}
+            </h1>
             <span className="text-[9px] text-[#6C307D] font-bold uppercase tracking-wider block mt-0.5">
               ENTERPRISE CMS
             </span>

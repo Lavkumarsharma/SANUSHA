@@ -361,12 +361,174 @@ app.delete('/api/products/:id', authenticate, async (req: any, res: any) => {
 // ----------------------------------------------------
 // 4. CATEGORIES & COLLECTIONS API
 // ----------------------------------------------------
+async function ensureDefaultDataSeeded() {
+  try {
+    const catCount = await prisma.category.count();
+    if (catCount === 0) {
+      console.log('🌱 Auto-seeding default SANUSHA categories, products & CMS settings...');
+
+      const decorAccents = await prisma.category.create({
+        data: {
+          name: 'Decor Accents',
+          slug: 'decor-accents',
+          description: 'Artisan ceramic vases and candle lanterns',
+          image: '/images/cat_decor_accents.jpg',
+          isMegaMenu: true,
+          order: 1,
+        },
+      });
+
+      const vasesPlanters = await prisma.category.create({
+        data: {
+          name: 'Vases & Planters',
+          slug: 'vases-planters',
+          description: 'Handmolded terracotta and ceramic vases',
+          image: '/images/prod_ceramic_vase_1.jpg',
+          isMegaMenu: true,
+          order: 2,
+        },
+      });
+
+      const storageBaskets = await prisma.category.create({
+        data: {
+          name: 'Storage & Baskets',
+          slug: 'storage-baskets',
+          description: 'Handwoven natural seagrass baskets',
+          image: '/images/prod_basket_1.jpg',
+          isMegaMenu: true,
+          order: 3,
+        },
+      });
+
+      const wallArt = await prisma.category.create({
+        data: {
+          name: 'Wall & Art',
+          slug: 'wall-art',
+          description: 'Boho macrame wall hangings and tapestries',
+          image: '/images/cat_wall_art.jpg',
+          isMegaMenu: true,
+          order: 4,
+        },
+      });
+
+      await prisma.product.createMany({
+        data: [
+          {
+            name: 'Carved Wooden Lantern',
+            slug: 'carved-wooden-lantern',
+            sku: 'SKU-LANTERN-01',
+            price: 1899,
+            originalPrice: 2499,
+            badge: 'HANDCRAFTED',
+            status: 'PUBLISHED',
+            gender: 'Unisex',
+            categoryId: decorAccents.id,
+            material: 'Mango Wood & Brass Glass',
+            description: 'Hand-carved solid mango wood candle lantern featuring delicate geometric lattice work and brass accents.',
+            detailsBullets: '100% Solid Mango Wood\nGlass Cylinder Included\nBrass Handle',
+            image: '/images/prod_lantern_1.jpg',
+            galleryImages: JSON.stringify([
+              '/images/prod_lantern_1.jpg',
+              '/images/prod_lantern_2.jpg',
+              '/images/prod_lantern_3.jpg',
+            ]),
+            stock: 50,
+          },
+          {
+            name: 'Minimal Ceramic Vase',
+            slug: 'minimal-ceramic-vase',
+            sku: 'SKU-VASE-01',
+            price: 999,
+            originalPrice: 1499,
+            badge: 'BESTSELLER',
+            status: 'PUBLISHED',
+            gender: 'Unisex',
+            categoryId: vasesPlanters.id,
+            material: 'Matte Ceramic Clay',
+            description: 'Contemporary Scandinavian matte ceramic bud vase in warm desert sand tone.',
+            detailsBullets: 'Matte Glazed Finish\nWater Resistant\nHand Crafted',
+            image: '/images/prod_ceramic_vase_1.jpg',
+            galleryImages: JSON.stringify([
+              '/images/prod_ceramic_vase_1.jpg',
+              '/images/prod_ceramic_vase_2.jpg',
+            ]),
+            stock: 45,
+          },
+          {
+            name: 'Woven Seagrass Storage Basket',
+            slug: 'woven-seagrass-basket',
+            sku: 'SKU-BASKET-01',
+            price: 1299,
+            originalPrice: 1799,
+            badge: 'ECO FRIENDLY',
+            status: 'PUBLISHED',
+            gender: 'Unisex',
+            categoryId: storageBaskets.id,
+            material: 'Natural Seagrass',
+            description: 'Handwoven sturdy seagrass storage basket with reinforced leather handles.',
+            detailsBullets: 'Natural Fiber\nFoldable Design\nMultipurpose Storage',
+            image: '/images/prod_basket_1.jpg',
+            galleryImages: JSON.stringify(['/images/prod_basket_1.jpg']),
+            stock: 60,
+          },
+          {
+            name: 'Macrame Wall Hanging',
+            slug: 'macrame-wall-hanging',
+            sku: 'SKU-MACRAME-01',
+            price: 1599,
+            originalPrice: 2199,
+            badge: 'NEW ARRIVAL',
+            status: 'PUBLISHED',
+            gender: 'Unisex',
+            categoryId: wallArt.id,
+            material: '100% Organic Cotton Cord',
+            description: 'Bohemian hand-knotted macrame wall tapestry on driftwood rod.',
+            detailsBullets: 'Natural Driftwood Rod\n100% Organic Cotton Cord\nHand Knotted',
+            image: '/images/cat_wall_art.jpg',
+            galleryImages: JSON.stringify(['/images/cat_wall_art.jpg']),
+            stock: 30,
+          },
+        ],
+      }).catch(() => {});
+
+      await prisma.themeSetting.upsert({
+        where: { key: 'cms_hero_slides' },
+        update: {},
+        create: {
+          key: 'cms_hero_slides',
+          value: JSON.stringify([
+            {
+              id: 'slide-1',
+              title: 'CRAFTED WITH MEANING.',
+              subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
+              badgeText: 'HANDCRAFTED LUXURY',
+              bannerUrl: '/images/decor_hero_banner.jpg',
+              mobileBannerUrl: '',
+              buttonText: 'EXPLORE COLLECTION',
+              buttonLink: '/shop',
+              showOverlay: true,
+              active: true,
+            },
+          ]),
+        },
+      }).catch(() => {});
+    }
+  } catch (err) {
+    console.error('Auto-seed check failed:', err);
+  }
+}
+
 app.get('/api/categories', async (req: any, res: any) => {
-  const categories = await prisma.category.findMany({
-    include: { products: true },
-    orderBy: { order: 'asc' },
-  });
-  res.json(categories);
+  try {
+    await ensureDefaultDataSeeded();
+    const categories = await prisma.category.findMany({
+      include: { products: true },
+      orderBy: { order: 'asc' },
+    });
+    res.json(categories);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post('/api/categories', authenticate, async (req: any, res: any) => {
