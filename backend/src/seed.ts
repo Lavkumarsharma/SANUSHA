@@ -252,6 +252,22 @@ async function main() {
     { key: 'fontBody', value: 'Plus Jakarta Sans' },
     { key: 'headerLayout', value: 'CENTER_LOGO' },
     { key: 'borderRadius', value: '4px' },
+    {
+      key: 'cms_hero_slides',
+      value: JSON.stringify([
+        {
+          id: 'slide-1',
+          title: 'CRAFTED WITH MEANING.',
+          subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
+          badgeText: 'HANDCRAFTED LUXURY',
+          bannerUrl: '/images/decor_hero_banner.jpg',
+          buttonText: 'EXPLORE COLLECTION',
+          buttonLink: '/shop',
+          showOverlay: true,
+          active: true,
+        },
+      ]),
+    },
   ];
 
   for (const t of themeDefaults) {

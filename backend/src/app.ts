@@ -495,22 +495,13 @@ app.get('/api/cms/hero', async (req: any, res: any) => {
     const defaultSlides = [
       {
         id: 'slide-1',
-        title: 'TIMELESS ELEGANCE & MODERN PURITY',
-        subtitle: 'Hand-crafted luxury linen, refined silhouettes, and conscious fashion.',
-        badgeText: 'LUXURY EDIT 2026',
-        bannerUrl: '/images/hero_banner.jpg',
-        buttonText: 'SHOP THE COLLECTION',
+        title: 'CRAFTED WITH MEANING.',
+        subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
+        badgeText: 'HANDCRAFTED LUXURY',
+        bannerUrl: '/images/decor_hero_banner.jpg',
+        buttonText: 'EXPLORE COLLECTION',
         buttonLink: '/shop',
-        active: true,
-      },
-      {
-        id: 'slide-2',
-        title: 'RESORT & SUMMER LUXURY CO-ORDS',
-        subtitle: 'Breezy European flax linen sets designed for sun-soaked getaways.',
-        badgeText: 'SUMMER ESSENTIALS',
-        bannerUrl: '/images/summer_banner_model.jpg',
-        buttonText: 'EXPLORE RESORTWEAR',
-        buttonLink: '/shop?category=Resortwear',
+        showOverlay: true,
         active: true,
       },
     ];

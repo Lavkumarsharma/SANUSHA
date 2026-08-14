@@ -115,8 +115,8 @@ export default function StorefrontHomePage() {
     return [
       {
         id: 'slide-1',
-        title: 'CRAFTED FOR BEAUTIFUL SPACES.',
-        subtitle: 'Timeless décor. Handcrafted with care. Made to bring warmth, meaning and elegance.',
+        title: 'CRAFTED WITH MEANING.',
+        subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
         badgeText: 'HANDCRAFTED LUXURY',
         bannerUrl: '/images/decor_hero_banner.jpg',
         buttonText: 'EXPLORE COLLECTION',
