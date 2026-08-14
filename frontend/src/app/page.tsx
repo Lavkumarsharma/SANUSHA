@@ -177,8 +177,8 @@ export default function StorefrontHomePage() {
         <section className="relative w-full aspect-[16/9] min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden">
           {heroSlides.map((slide, idx) => {
             const isCurrent = idx === currentSlideIdx;
-            const hasTextContent = (slide.title?.trim() || slide.subtitle?.trim() || slide.badgeText?.trim());
-            const shouldShowOverlay = slide.showOverlay !== false && hasTextContent;
+            const hasTextContent = !!(slide.title?.trim() || slide.subtitle?.trim() || slide.badgeText?.trim());
+            const shouldShowOverlay = slide.showOverlay === true && hasTextContent;
             const desktopImgSrc = getImageUrl(slide.bannerUrl) || '/images/decor_hero_banner.jpg';
             const mobileImgSrc = slide.mobileBannerUrl ? (getImageUrl(slide.mobileBannerUrl) || desktopImgSrc) : '';
 
