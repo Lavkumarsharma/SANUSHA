@@ -679,7 +679,8 @@ export default function CMSPageBuilderPage() {
         body: formData,
       });
       const data = await res.json();
-      if (data.url) {
+      // Only override if stored on persistent external cloud storage (e.g. S3/Cloudinary)
+      if (data.url && (data.url.startsWith('http://') || data.url.startsWith('https://'))) {
         if (field === 'heroSlide' && typeof slideIndex === 'number') {
           handleUpdateHeroSlide(slideIndex, 'bannerUrl', data.url);
         }
@@ -712,7 +713,7 @@ export default function CMSPageBuilderPage() {
     sectionIndex?: number,
     slideIndex?: number
   ) => {
-    // Immediately apply base64 image locally to ensure cross-device consistency
+    // Immediately apply base64 image locally to ensure cross-device consistency and MongoDB permanence
     if (base64) {
       if (field === 'icon') setHeaderConfig((prev) => ({ ...prev, iconUrl: base64 }));
       if (field === 'logo') setHeaderConfig((prev) => ({ ...prev, logoUrl: base64 }));
@@ -748,7 +749,8 @@ export default function CMSPageBuilderPage() {
         }),
       });
       const data = await res.json();
-      if (data.url) {
+      // Only override if stored on persistent external cloud storage (e.g. S3/Cloudinary)
+      if (data.url && (data.url.startsWith('http://') || data.url.startsWith('https://'))) {
         if (field === 'icon') setHeaderConfig((prev) => ({ ...prev, iconUrl: data.url }));
         if (field === 'logo') setHeaderConfig((prev) => ({ ...prev, logoUrl: data.url }));
         if (field === 'megaBanner') {
