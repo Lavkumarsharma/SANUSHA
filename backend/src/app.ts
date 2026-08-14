@@ -1140,6 +1140,9 @@ app.get('/api/theme/settings', async (req: any, res: any) => {
   const settings = await prisma.themeSetting.findMany();
   const themeMap: any = {};
   settings.forEach((s) => (themeMap[s.key] = s.value));
+  if (!themeMap.google_client_id) {
+    themeMap.google_client_id = '623721780519-8352eo1m091a5c85am7bc6drfqf905ih.apps.googleusercontent.com';
+  }
   res.json(themeMap);
 });
 

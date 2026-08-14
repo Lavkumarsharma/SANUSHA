@@ -21,7 +21,7 @@ export default function CustomerRegisterPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleClientId, setGoogleClientId] = useState('1082574939241-sanusha.apps.googleusercontent.com');
+  const [googleClientId, setGoogleClientId] = useState('623721780519-8352eo1m091a5c85am7bc6drfqf905ih.apps.googleusercontent.com');
 
   const [headerConfig, setHeaderConfig] = useState({
     brandName: 'SANUSHA',
@@ -47,7 +47,7 @@ export default function CustomerRegisterPage() {
 
   useEffect(() => {
     const scriptId = 'google-jssdk';
-    const effectiveClientId = googleClientId || '1082574939241-sanusha.apps.googleusercontent.com';
+    const effectiveClientId = googleClientId || '623721780519-8352eo1m091a5c85am7bc6drfqf905ih.apps.googleusercontent.com';
 
     const loadGSI = () => {
       if ((window as any).google) {
@@ -151,7 +151,7 @@ export default function CustomerRegisterPage() {
 
   const handleManualGoogleClick = () => {
     setLoading(true);
-    const effectiveClientId = googleClientId || '1082574939241-sanusha.apps.googleusercontent.com';
+    const effectiveClientId = googleClientId || '623721780519-8352eo1m091a5c85am7bc6drfqf905ih.apps.googleusercontent.com';
 
     if ((window as any).google?.accounts?.oauth2) {
       try {

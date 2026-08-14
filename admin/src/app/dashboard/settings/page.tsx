@@ -14,7 +14,7 @@ export default function StoreSettingsPage() {
     freeShippingThreshold: 999,
     razorpayKey: 'rzp_live_9876543210',
     stripeKey: 'pk_live_1234567890',
-    googleClientId: '',
+    googleClientId: '623721780519-8352eo1m091a5c85am7bc6drfqf905ih.apps.googleusercontent.com',
     googleClientSecret: '',
   });
 
