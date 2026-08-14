@@ -18,7 +18,7 @@ This repository is pre-configured and cleaned for seamless deployment:
 3. Add Environment Variables in Render Dashboard:
    - `PORT`: `5000` (or Render default)
    - `JWT_SECRET`: `your_secure_random_jwt_secret_key`
-   - `DATABASE_URL`: `file:./dev.db` (or PostgreSQL URL)
+   - `DATABASE_URL`: `mongodb+srv://<username>:<password>@cluster0.mongodb.net/sanusha_db?retryWrites=true&w=majority` (MongoDB Atlas Persistent URL)
 4. Once deployed, copy your Render Live Backend URL (e.g., `https://sanusha-backend.onrender.com`).
 
 ---

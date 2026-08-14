@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -8,7 +8,7 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
   name      String
@@ -19,7 +19,7 @@ model User {
 }
 
 model Category {
-  id          String     @id @default(uuid())
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   slug        String     @unique
   description String?
@@ -28,8 +28,8 @@ model Category {
   icon        String?
   isMegaMenu  Boolean    @default(false)
   order       Int        @default(0)
-  parentId    String?
-  parent      Category?  @relation("ParentCategory", fields: [parentId], references: [id])
+  parentId    String?    @db.ObjectId
+  parent      Category?  @relation("ParentCategory", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children    Category[] @relation("ParentCategory")
   products    Product[]
   createdAt   DateTime   @default(now())
@@ -37,7 +37,7 @@ model Category {
 }
 
 model Collection {
-  id          String    @id @default(uuid())
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String    @unique
   subtitle    String?
@@ -50,7 +50,7 @@ model Collection {
 }
 
 model Product {
-  id             String           @id @default(uuid())
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   slug           String           @unique
   sku            String           @unique
@@ -61,9 +61,9 @@ model Product {
   badge          String?
   gender         String           @default("Unisex")
   category       Category?        @relation(fields: [categoryId], references: [id])
-  categoryId     String?
+  categoryId     String?          @db.ObjectId
   collection     Collection?      @relation(fields: [collectionId], references: [id])
-  collectionId   String?
+  collectionId   String?          @db.ObjectId
   material       String           @default("Cotton")
   pattern        String           @default("Solid")
   description    String
@@ -80,9 +80,9 @@ model Product {
 }
 
 model ProductVariant {
-  id         String   @id @default(uuid())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId  String
+  productId  String   @db.ObjectId
   size       String
   color      String
   sku        String   @unique
@@ -92,10 +92,10 @@ model ProductVariant {
 }
 
 model Order {
-  id              String      @id @default(uuid())
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
   orderNumber     String      @unique
   user            User?       @relation(fields: [userId], references: [id])
-  userId          String?
+  userId          String?     @db.ObjectId
   customerName    String
   email           String
   phone           String
@@ -114,11 +114,11 @@ model Order {
 }
 
 model OrderItem {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId     String
+  orderId     String   @db.ObjectId
   product     Product? @relation(fields: [productId], references: [id])
-  productId   String?
+  productId   String?  @db.ObjectId
   productName String
   quantity    Int
   price       Float
@@ -127,16 +127,16 @@ model OrderItem {
 }
 
 model StockLog {
-  id           String   @id @default(uuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId    String
+  productId    String   @db.ObjectId
   changeAmount Int
   reason       String   @default("MANUAL_UPDATE")
   createdAt    DateTime @default(now())
 }
 
 model CmsSection {
-  id           String   @id @default(uuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   key          String   @unique
   title        String
   subtitle     String?
@@ -150,14 +150,14 @@ model CmsSection {
 }
 
 model ThemeSetting {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   key       String   @unique
   value     String
   updatedAt DateTime @updatedAt
 }
 
 model MediaItem {
-  id           String   @id @default(uuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   filename     String
   originalName String
   mimeType     String
@@ -168,14 +168,14 @@ model MediaItem {
 }
 
 model StoreSetting {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   key       String   @unique
   value     String
   updatedAt DateTime @updatedAt
 }
 
 model BlogPost {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   slug      String   @unique
   content   String
@@ -188,7 +188,7 @@ model BlogPost {
 }
 
 model Coupon {
-  id             String    @id @default(uuid())
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
   code           String    @unique
   discountType   String    @default("PERCENTAGE") // PERCENTAGE, FIXED
   discountValue  Float
