@@ -14,8 +14,19 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const defaultMongoUrl = 'mongodb+srv://sanusha_user:Sanusha2026Pass@cluster0.mongodb.net/sanusha_db?retryWrites=true&w=majority';
+const activeDbUrl = process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('mongo')
+  ? process.env.DATABASE_URL
+  : defaultMongoUrl;
+
 const app = express();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: activeDbUrl,
+    },
+  },
+});
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'sanusha_jwt_secret_2026';
 
@@ -136,8 +147,8 @@ async function seedCleanCMSSections() {
         ],
       });
     }
-  } catch (e) {
-    console.error('Error seeding clean CMS sections:', e);
+  } catch (e: any) {
+    console.warn('CMS section check notice:', e?.message || e);
   }
 }
 
