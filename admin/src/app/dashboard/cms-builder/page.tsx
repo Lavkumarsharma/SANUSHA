@@ -58,8 +58,12 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, targetField, 
     const img = imgRef.current;
     if (!img) return;
 
-    if (ratioStr === '100%' || ratioStr === 'free') {
-      if (ratioStr === 'free') setIsLocked(false);
+    if (ratioStr === '100%' || ratioStr === 'free' || ratioStr === 'fit-logo') {
+      if (ratioStr === 'free' || ratioStr === 'fit-logo') setIsLocked(false);
+      if (ratioStr === 'fit-logo') {
+        setCrop({ x: 2, y: 5, width: 96, height: 90 });
+        return;
+      }
       setCrop({ x: 0, y: 0, width: 100, height: 100 });
       return;
     }
@@ -95,7 +99,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, targetField, 
   };
 
   const handleImageLoad = () => {
-    applyRatioPreset('16:9');
+    applyRatioPreset(initialRatio);
   };
 
   const handleMouseDown = (handle: string, e: React.MouseEvent) => {
@@ -254,6 +258,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, targetField, 
             <span className="text-slate-500 uppercase text-[9px] tracking-wider px-2">Presets:</span>
             {(targetField === 'logo' || targetField === 'icon'
               ? [
+                  { label: '✨ Perfect Fit Header Logo (Auto)', val: 'fit-logo', icon: Sparkles },
                   { label: '3:1 Wide Header Logo', val: '3:1', icon: Maximize2 },
                   { label: '4:1 Compact Wide Logo', val: '4:1', icon: Tv },
                   { label: '1:1 Square Icon / Favicon', val: '1:1', icon: Monitor },
@@ -1729,6 +1734,7 @@ export default function CMSPageBuilderPage() {
       {cropModalData && (
         <ImageCropModal
           imageSrc={cropModalData.src}
+          targetField={cropModalData.targetField}
           onCropComplete={(croppedBase64) =>
             uploadCroppedImage(croppedBase64, cropModalData.targetField, cropModalData.sectionIndex, cropModalData.slideIndex)
           }
