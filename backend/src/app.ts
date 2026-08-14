@@ -11,6 +11,11 @@ import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
 
+// Ensure DATABASE_URL starts with mongo protocol for MongoDB provider
+if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('mongo')) {
+  process.env.DATABASE_URL = 'mongodb+srv://sanusha_user:Sanusha2026Pass@cluster0.gxzpy.mongodb.net/sanusha_db?retryWrites=true&w=majority';
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
