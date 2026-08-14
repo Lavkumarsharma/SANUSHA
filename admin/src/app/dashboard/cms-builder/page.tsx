@@ -34,19 +34,22 @@ import { fetchApi, API_BASE_URL, getImageUrl } from '@/lib/api';
 // ----------------------------------------------------
 interface ImageCropModalProps {
   imageSrc: string;
+  targetField?: 'icon' | 'logo' | 'section' | 'megaBanner' | 'heroSlide' | 'mobileHeroSlide';
   onCropComplete: (croppedBase64: string) => void;
   onClose: () => void;
 }
 
-const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onCropComplete, onClose }) => {
+const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, targetField, onCropComplete, onClose }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+
+  const initialRatio = targetField === 'logo' ? '3:1' : targetField === 'icon' ? '1:1' : targetField === 'mobileHeroSlide' ? '3:4' : '16:9';
 
   const [crop, setCrop] = useState({ x: 0, y: 10, width: 100, height: 80 });
   const [activeHandle, setActiveHandle] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialCrop, setInitialCrop] = useState({ x: 0, y: 10, width: 100, height: 80 });
-  const [selectedRatio, setSelectedRatio] = useState<string>('16:9');
+  const [selectedRatio, setSelectedRatio] = useState<string>(initialRatio);
   const [isLocked, setIsLocked] = useState<boolean>(true);
 
   // Aspect ratio preset setter
@@ -55,7 +58,8 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onCropComplet
     const img = imgRef.current;
     if (!img) return;
 
-    if (ratioStr === '100%') {
+    if (ratioStr === '100%' || ratioStr === 'free') {
+      if (ratioStr === 'free') setIsLocked(false);
       setCrop({ x: 0, y: 0, width: 100, height: 100 });
       return;
     }
@@ -63,7 +67,10 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onCropComplet
     let targetRatio = 16 / 9; // Default 16:9 Homepage Hero
     if (ratioStr === '21:9') targetRatio = 21 / 9;
     if (ratioStr === '3:1') targetRatio = 3 / 1;
+    if (ratioStr === '4:1') targetRatio = 4 / 1;
     if (ratioStr === '4:3') targetRatio = 4 / 3;
+    if (ratioStr === '3:4') targetRatio = 3 / 4;
+    if (ratioStr === '9:16') targetRatio = 9 / 16;
     if (ratioStr === '1:1') targetRatio = 1 / 1;
 
     const imgAspect = img.naturalWidth / img.naturalHeight;
@@ -206,8 +213,20 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onCropComplet
           <div className="flex items-center gap-2">
             <Crop className="w-5 h-5 text-[#6C307D]" />
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">Homepage Hero Banner Precision Aspect-Ratio Cropper</h3>
-              <p className="text-[10px] text-slate-500 font-medium">Default locked crop (16:9) applied for optimal homepage quality & framing</p>
+              <h3 className="font-bold text-slate-900 text-sm">
+                {targetField === 'logo' || targetField === 'icon'
+                  ? '🏷️ Brand Logo & Icon Precision Aspect-Ratio Cropper'
+                  : targetField === 'mobileHeroSlide'
+                  ? '📱 Mobile Phone Banner Precision Cropper'
+                  : '🖥️ Homepage Hero Banner Precision Aspect-Ratio Cropper'}
+              </h3>
+              <p className="text-[10px] text-slate-500 font-medium">
+                {targetField === 'logo' || targetField === 'icon'
+                  ? 'Specialized 3:1 Wide Logo & 1:1 Square Icon presets for clean header alignment'
+                  : targetField === 'mobileHeroSlide'
+                  ? 'Optimized 3:4 / 9:16 portrait crop preset for mobile phone screens'
+                  : 'Default locked crop (16:9) applied for optimal homepage quality & framing'}
+              </p>
             </div>
           </div>
 
@@ -232,14 +251,32 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ imageSrc, onCropComplet
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           {/* Aspect Ratio Presets Bar */}
           <div className="flex flex-wrap items-center gap-2 bg-slate-100 p-2 rounded-lg font-bold text-[11px]">
-            <span className="text-slate-500 uppercase text-[9px] tracking-wider px-2">Hero Presets:</span>
-            {[
-              { label: '16:9 Hero (Homepage Default Locked)', val: '16:9', icon: Monitor },
-              { label: '21:9 Ultrawide Banner', val: '21:9', icon: Tv },
-              { label: '3:1 Panorama', val: '3:1', icon: Maximize2 },
-              { label: '4:3 Standard', val: '4:3', icon: Monitor },
-              { label: '100% Full Original', val: '100%', icon: Check },
-            ].map((preset) => {
+            <span className="text-slate-500 uppercase text-[9px] tracking-wider px-2">Presets:</span>
+            {(targetField === 'logo' || targetField === 'icon'
+              ? [
+                  { label: '3:1 Wide Header Logo', val: '3:1', icon: Maximize2 },
+                  { label: '4:1 Compact Wide Logo', val: '4:1', icon: Tv },
+                  { label: '1:1 Square Icon / Favicon', val: '1:1', icon: Monitor },
+                  { label: '100% Full Uncropped', val: '100%', icon: Check },
+                  { label: 'Free Custom Crop', val: 'free', icon: Crop },
+                ]
+              : targetField === 'mobileHeroSlide'
+              ? [
+                  { label: '3:4 Mobile Phone Banner', val: '3:4', icon: Monitor },
+                  { label: '9:16 Tall Portrait', val: '9:16', icon: Tv },
+                  { label: '1:1 Square', val: '1:1', icon: Maximize2 },
+                  { label: '100% Full Original', val: '100%', icon: Check },
+                  { label: 'Free Custom Crop', val: 'free', icon: Crop },
+                ]
+              : [
+                  { label: '16:9 Hero (Homepage Default)', val: '16:9', icon: Monitor },
+                  { label: '21:9 Ultrawide Banner', val: '21:9', icon: Tv },
+                  { label: '3:1 Panorama', val: '3:1', icon: Maximize2 },
+                  { label: '4:3 Standard', val: '4:3', icon: Monitor },
+                  { label: '100% Full Original', val: '100%', icon: Check },
+                  { label: 'Free Custom Crop', val: 'free', icon: Crop },
+                ]
+            ).map((preset) => {
               const Icon = preset.icon;
               const isActive = selectedRatio === preset.val;
               return (
