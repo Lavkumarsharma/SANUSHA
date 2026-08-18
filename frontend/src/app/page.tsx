@@ -120,7 +120,14 @@ export default function StorefrontHomePage() {
   // Instant, independent Hero Slide fetch & image pre-loader
   useEffect(() => {
     const updateSlides = (slides: any[]) => {
-      const activeSlides = slides.filter((s: any) => s.active !== false);
+      const sanitized = slides.map((s: any) => {
+        let bUrl = s.bannerUrl || '';
+        if (bUrl === '/images/hero_banner.jpg' || bUrl.endsWith('/hero_banner.jpg')) {
+          bUrl = '/images/decor_hero_banner.jpg';
+        }
+        return { ...s, bannerUrl: bUrl };
+      });
+      const activeSlides = sanitized.filter((s: any) => s.active !== false);
       if (activeSlides.length > 0) {
         // Pre-load slide images into memory immediately
         activeSlides.forEach((slide: any) => {

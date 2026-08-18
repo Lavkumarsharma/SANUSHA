@@ -1015,7 +1015,9 @@ app.get('/api/cms/hero', async (req: any, res: any) => {
               mbUrl = '';
             }
           }
-          if (!bUrl) bUrl = '/images/hero_banner.jpg';
+          if (!bUrl || bUrl === '/images/hero_banner.jpg' || bUrl.endsWith('/hero_banner.jpg')) {
+            bUrl = '/images/decor_hero_banner.jpg';
+          }
 
           return {
             ...slide,
@@ -1023,6 +1025,15 @@ app.get('/api/cms/hero', async (req: any, res: any) => {
             mobileBannerUrl: mbUrl,
           };
         });
+
+        // Persist sanitized slides back to DB if legacy hero_banner.jpg was found
+        if (setting.value.includes('hero_banner.jpg')) {
+          prisma.themeSetting.update({
+            where: { key: 'cms_hero_slides' },
+            data: { value: JSON.stringify(sanitized) },
+          }).catch(() => {});
+        }
+
         memoryCMSStore.hero = sanitized;
         return res.json(sanitized);
       }
