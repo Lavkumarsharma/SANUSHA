@@ -248,7 +248,7 @@ export const Navbar: React.FC = () => {
                 className="h-8 lg:h-10 w-auto object-contain"
               />
             ) : (
-              <span className="font-serif text-2xl lg:text-3xl font-bold tracking-[0.28em] uppercase text-gray-900 group-hover:text-[#C5A059] transition-colors duration-300">
+              <span className="font-serif text-2xl lg:text-3xl font-extrabold tracking-[0.28em] uppercase text-gray-900 group-hover:text-[#C5A059] transition-colors duration-300">
                 {headerConfig.brandName || 'SANUSHA'}
               </span>
             )}
@@ -292,12 +292,12 @@ export const Navbar: React.FC = () => {
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#C5A059] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-left" />
             </button>
 
-            {/* ACCOUNT BUTTON (BOLD TEXT ONLY) */}
+            {/* ACCOUNT BUTTON (BOLD TEXT ONLY - ALWAYS SHOW ACCOUNT) */}
             <Link
               href={customerUser ? '/account' : '/login'}
               className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 group"
             >
-              <span>{customerUser ? customerUser.name?.split(' ')[0] || 'ACCOUNT' : 'ACCOUNT'}</span>
+              <span>ACCOUNT</span>
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#C5A059] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-left" />
             </Link>
           </nav>
