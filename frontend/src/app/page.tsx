@@ -113,7 +113,19 @@ export default function StorefrontHomePage() {
         }
       } catch (e) {}
     }
-    return [];
+    return [
+      {
+        id: 'slide-1',
+        title: '',
+        subtitle: '',
+        badgeText: '',
+        bannerUrl: '/images/decor_hero_banner.jpg',
+        buttonText: '',
+        buttonLink: '/shop',
+        showOverlay: false,
+        active: true,
+      },
+    ];
   });
   const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 
