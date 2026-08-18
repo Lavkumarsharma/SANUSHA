@@ -238,8 +238,8 @@ export const Navbar: React.FC = () => {
           ))}
         </nav>
 
-        {/* CENTER LOGO & TAGLINE */}
-        <div className="flex flex-col items-center justify-center text-center">
+        {/* CENTER LOGO & TAGLINE (MATHEMATICALLY CENTERED ON SCREEN) */}
+        <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-1/2 lg:-translate-y-1/2 flex flex-col items-center justify-center text-center z-10 pointer-events-auto my-1 lg:my-0">
           <Link href="/" className="group flex flex-col items-center">
             {getImageUrl(headerConfig.logoUrl) ? (
               <img
@@ -280,25 +280,23 @@ export const Navbar: React.FC = () => {
               </Link>
             </div>
 
-            {/* SEARCH TRIGGER */}
+            {/* SEARCH TRIGGER BUTTON (BOLD TEXT ONLY) */}
             <button
               onClick={() => {
                 setIsSearchOpen(true);
                 setTimeout(() => searchInputRef.current?.focus(), 100);
               }}
-              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 flex items-center gap-1.5 group"
+              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 group"
             >
-              <Search className="w-3.5 h-3.5 text-[#C5A059]" />
               <span>SEARCH</span>
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#C5A059] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-left" />
             </button>
 
-            {/* ACCOUNT */}
+            {/* ACCOUNT BUTTON (BOLD TEXT ONLY) */}
             <Link
               href={customerUser ? '/account' : '/login'}
-              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 flex items-center gap-1.5 group"
+              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 group"
             >
-              <User className="w-3.5 h-3.5 text-gray-700 group-hover:text-[#C5A059] transition-colors" />
               <span>{customerUser ? customerUser.name?.split(' ')[0] || 'ACCOUNT' : 'ACCOUNT'}</span>
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#C5A059] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-left" />
             </Link>
