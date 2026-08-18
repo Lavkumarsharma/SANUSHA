@@ -139,26 +139,63 @@ export default function StorefrontHomePage() {
   });
   const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 
+  // Instant, independent Hero Slide fetch & image pre-loader
+  useEffect(() => {
+    const updateSlides = (slides: any[]) => {
+      const activeSlides = slides.filter((s: any) => s.active !== false);
+      if (activeSlides.length > 0) {
+        // Pre-load slide images into memory immediately
+        activeSlides.forEach((slide: any) => {
+          if (slide.bannerUrl) {
+            const img = new Image();
+            img.src = getImageUrl(slide.bannerUrl);
+          }
+          if (slide.mobileBannerUrl) {
+            const img = new Image();
+            img.src = getImageUrl(slide.mobileBannerUrl);
+          }
+        });
+        setHeroSlides(activeSlides);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(activeSlides));
+        }
+      }
+    };
+
+    // 1. Fetch fresh hero slides immediately with no-cache query parameter
+    fetchApi('/cms/hero?t=' + Date.now())
+      .then((hero) => {
+        if (hero && Array.isArray(hero) && hero.length > 0) {
+          updateSlides(hero);
+        }
+      })
+      .catch((e) => console.warn('Hero banner fresh fetch notice:', e));
+
+    // 2. Multi-tab/Window live sync listener
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'sanusha_cms_hero_cache' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setHeroSlides(parsed);
+          }
+        } catch (err) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   useEffect(() => {
     Promise.all([
       fetchApi('/products').catch(() => PRODUCTS_DATA),
       fetchApi('/categories').catch(() => []),
       fetchApi('/cms/sections').catch(() => []),
-      fetchApi('/cms/hero').catch(() => null),
     ])
-      .then(([prods, cats, secs, hero]) => {
+      .then(([prods, cats, secs]) => {
         if (prods && prods.length > 0) setProducts(prods);
         if (cats && cats.length > 0) setCategories(cats);
         if (secs && secs.length > 0) setSections(secs);
-        if (hero && Array.isArray(hero) && hero.length > 0) {
-          const activeSlides = hero.filter((s: any) => s.active !== false);
-          if (activeSlides.length > 0) {
-            setHeroSlides(activeSlides);
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(activeSlides));
-            }
-          }
-        }
       })
       .finally(() => setLoading(false));
   }, []);

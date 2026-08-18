@@ -569,6 +569,9 @@ export default function CMSPageBuilderPage() {
         method: 'PUT',
         body: JSON.stringify(heroSlides),
       });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(heroSlides));
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       loadCMSData();

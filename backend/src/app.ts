@@ -973,6 +973,9 @@ app.put('/api/orders/:id/status', authenticate, async (req: any, res: any) => {
 // 6. HERO SLIDES & CMS EDITORIAL API
 // ----------------------------------------------------
 app.get('/api/cms/hero', async (req: any, res: any) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   try {
     const setting = await prisma.themeSetting.findUnique({ where: { key: 'cms_hero_slides' } });
     if (setting) {
