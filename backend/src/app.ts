@@ -1015,7 +1015,9 @@ app.get('/api/cms/hero', async (req: any, res: any) => {
               mbUrl = '';
             }
           }
-          if (!bUrl) bUrl = '/images/decor_hero_banner.jpg';
+          if (!bUrl || bUrl.includes('hero_banner.jpg')) {
+            bUrl = '/images/decor_hero_banner.jpg';
+          }
 
           return {
             ...slide,

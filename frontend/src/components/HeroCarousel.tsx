@@ -109,7 +109,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
 
   return (
     <section
-      className="relative w-full aspect-[3/4] sm:aspect-[16/9] min-h-[480px] sm:min-h-[420px] max-h-[85vh] bg-[#111827] overflow-hidden select-none group"
+      className="relative w-full aspect-[3/4] sm:aspect-[16/9] min-h-[480px] sm:min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden select-none group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       aria-label="Homepage Hero Carousel"
