@@ -401,7 +401,7 @@ export const Navbar: React.FC = () => {
               {/* CENTER BANNER CARD */}
               <div className="col-span-4 relative aspect-[4/3] rounded-xs overflow-hidden border border-[#E8DFC8] group shadow-md">
                 <img
-                  src="/images/prod_gift_box_1.jpg"
+                  src="/images/cat_decor_accents.jpg"
                   alt="Signature Collection"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
