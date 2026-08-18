@@ -13,6 +13,13 @@ import {
   X,
   Sparkles,
   ArrowRight,
+  Gift,
+  Home,
+  Flower2,
+  Gem,
+  Package,
+  CreditCard,
+  ChevronRight,
 } from 'lucide-react';
 import { useStore, PRODUCTS_DATA as FALLBACK_PRODUCTS } from '@/store/useStore';
 import { fetchApi, getImageUrl } from '@/lib/api';
@@ -348,96 +355,182 @@ export const Navbar: React.FC = () => {
 
       </div>
 
-      {/* FULL-WIDTH DESKTOP MEGA MENU DROPDOWN */}
+      {/* FULL-WIDTH DESKTOP MEGA MENU DROPDOWN (EXACT MATCH TO REFERENCE UI) */}
       {activeMenu && (
         <div
-          className="hidden lg:block absolute left-0 top-full w-full bg-white border-b border-[#EFE8DA] shadow-[0_15px_30px_rgba(0,0,0,0.06)] z-40 transition-all duration-300 animate-fadeIn"
+          className="hidden lg:block absolute left-0 top-full w-full bg-[#FAF7F2] border-b border-[#E8DFC8] shadow-[0_20px_40px_rgba(0,0,0,0.08)] z-40 transition-all duration-300 animate-fadeIn"
           onMouseEnter={() => {
             if (megaMenuTimeoutRef.current) clearTimeout(megaMenuTimeoutRef.current);
           }}
           onMouseLeave={handleMenuLeave}
         >
-          <div className="max-w-[1440px] mx-auto px-12 py-10 grid grid-cols-4 gap-8">
-            {/* Main Links List */}
-            <div className="col-span-3 grid grid-cols-3 gap-8">
-              <div>
-                <h3 className="font-serif text-lg font-bold text-gray-900 tracking-wider uppercase border-b border-[#EFE8DA] pb-2 mb-4">
-                  {activeMenu}
-                </h3>
-                <ul className="space-y-3">
-                  {MEGA_MENU_DATA[activeMenu].slice(0, 4).map((item, idx) => (
-                    <li key={idx}>
-                      <Link
-                        href={item.url}
-                        onClick={() => setActiveMenu(null)}
-                        className="text-xs font-sans font-medium text-gray-700 hover:text-[#C5A059] hover:translate-x-1 transition-all duration-200 inline-flex items-center gap-2"
-                      >
-                        <span className="w-1 h-1 rounded-full bg-amber-400/60" />
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+          <div className="max-w-[1440px] mx-auto p-8 space-y-6">
+            
+            {/* TOP GRID: LEFT ICON CATEGORIES | CENTER BANNER CARD | SUB-COLUMNS */}
+            <div className="grid grid-cols-12 gap-8 items-start">
+              
+              {/* LEFT CATEGORY COLUMN WITH OUTLINE ICONS */}
+              <div className="col-span-3 bg-white p-4 border border-[#E8DFC8] rounded-xs space-y-1 shadow-2xs">
+                {[
+                  { label: 'GIFT BOXES', icon: Gift, url: '/shop?filter=gift-boxes' },
+                  { label: 'HOME DECOR', icon: Home, url: '/shop?filter=home-decor' },
+                  { label: 'FRAGRANCES', icon: Sparkles, url: '/shop?filter=fragrances' },
+                  { label: 'ARTISAN CRAFTS', icon: Flower2, url: '/shop?filter=artisan-crafts' },
+                  { label: 'PERSONALIZED GIFTS', icon: Gem, url: '/shop?filter=personalized' },
+                  { label: 'CORPORATE GIFTS', icon: Package, url: '/shop?filter=corporate' },
+                  { label: 'GIFT CARDS', icon: CreditCard, url: '/shop?filter=gift-cards' },
+                ].map((cat, idx) => {
+                  const IconComp = cat.icon;
+                  return (
+                    <Link
+                      key={idx}
+                      href={cat.url}
+                      onClick={() => setActiveMenu(null)}
+                      className="flex items-center justify-between p-2.5 rounded-xs text-xs font-bold tracking-wider text-gray-800 hover:text-[#C5A059] hover:bg-[#FAF7F2] transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <IconComp className="w-4 h-4 text-[#C5A059] group-hover:scale-110 transition-transform" />
+                        <span>{cat.label}</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  );
+                })}
               </div>
 
-              <div>
-                <h3 className="font-serif text-lg font-bold text-gray-900 tracking-wider uppercase border-b border-[#EFE8DA] pb-2 mb-4">
-                  Curated Highlights
-                </h3>
-                <ul className="space-y-3">
-                  {MEGA_MENU_DATA[activeMenu].slice(4).map((item, idx) => (
-                    <li key={idx}>
-                      <Link
-                        href={item.url}
-                        onClick={() => setActiveMenu(null)}
-                        className="text-xs font-sans font-medium text-gray-700 hover:text-[#C5A059] hover:translate-x-1 transition-all duration-200 inline-flex items-center gap-2"
-                      >
-                        <span className="w-1 h-1 rounded-full bg-amber-400/60" />
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Gifting Guarantee Highlight Box */}
-              <div className="bg-[#FAF7F2] p-6 border border-[#E8DFC8] rounded-xs flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-sans font-bold tracking-[0.2em] uppercase text-[#C5A059] block mb-1">
-                    Signature House Service
+              {/* CENTER BANNER CARD */}
+              <div className="col-span-4 relative aspect-[4/3] rounded-xs overflow-hidden border border-[#E8DFC8] group shadow-md">
+                <img
+                  src="/images/prod_gift_box_1.jpg"
+                  alt="Signature Collection"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-6 text-white space-y-2">
+                  <span className="text-[10px] font-sans font-bold tracking-[0.25em] uppercase text-[#C5A059]">
+                    SIGNATURE COLLECTION
                   </span>
-                  <h4 className="font-serif text-base font-bold text-gray-900 mb-2">
-                    Gift-Ready Packaging
+                  <h4 className="font-serif text-lg font-bold leading-snug">
+                    Timeless pieces, crafted with meaning.
                   </h4>
-                  <p className="text-xs text-gray-600 font-light leading-relaxed">
-                    Every SANUSHA creation arrives in our signature gold-embossed box, ready to touch hearts.
-                  </p>
+                  <Link
+                    href="/shop?filter=signature"
+                    onClick={() => setActiveMenu(null)}
+                    className="inline-flex items-center gap-2 bg-[#C5A059] hover:bg-[#B38D48] text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-xs transition-colors self-start shadow-xs"
+                  >
+                    <span>EXPLORE NOW</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
                 </div>
-                <Link
-                  href="/shop?filter=signature"
-                  onClick={() => setActiveMenu(null)}
-                  className="pt-4 text-xs font-bold uppercase tracking-widest text-[#C5A059] hover:text-gray-900 inline-flex items-center gap-1 transition-colors"
-                >
-                  Explore Signature Line <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+              </div>
+
+              {/* SUB-COLUMNS: BY MATERIAL | BY STYLE | BESTSELLERS */}
+              <div className="col-span-5 grid grid-cols-3 gap-6 bg-white p-6 border border-[#E8DFC8] rounded-xs shadow-2xs">
+                {/* BY MATERIAL */}
+                <div className="space-y-3">
+                  <h4 className="font-serif text-xs font-bold text-gray-900 uppercase tracking-[0.2em] border-b border-[#E8DFC8] pb-1">
+                    BY MATERIAL
+                  </h4>
+                  <ul className="space-y-2 text-[11px] text-gray-600 font-sans">
+                    {['Wood', 'Ceramic', 'Brass', 'Glass', 'Fabric', 'Marble', 'Paper & Stationery'].map((item, i) => (
+                      <li key={i}>
+                        <Link
+                          href={`/shop?material=${item.toLowerCase()}`}
+                          onClick={() => setActiveMenu(null)}
+                          className="hover:text-[#C5A059] transition-colors"
+                        >
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* BY STYLE */}
+                <div className="space-y-3">
+                  <h4 className="font-serif text-xs font-bold text-gray-900 uppercase tracking-[0.2em] border-b border-[#E8DFC8] pb-1">
+                    BY STYLE
+                  </h4>
+                  <ul className="space-y-2 text-[11px] text-gray-600 font-sans">
+                    {['Minimal', 'Traditional', 'Luxury', 'Boho', 'Rustic', 'Modern', 'Classic'].map((item, i) => (
+                      <li key={i}>
+                        <Link
+                          href={`/shop?style=${item.toLowerCase()}`}
+                          onClick={() => setActiveMenu(null)}
+                          className="hover:text-[#C5A059] transition-colors"
+                        >
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* BESTSELLERS */}
+                <div className="space-y-3">
+                  <h4 className="font-serif text-xs font-bold text-gray-900 uppercase tracking-[0.2em] border-b border-[#E8DFC8] pb-1">
+                    BESTSELLERS
+                  </h4>
+                  <ul className="space-y-2 text-[11px] text-gray-600 font-sans">
+                    {['Top Rated', 'Customer Favorites', 'Trending Now', 'New Arrivals', 'Exclusive Pieces', 'Limited Editions'].map((item, i) => (
+                      <li key={i}>
+                        <Link
+                          href={`/shop?filter=${item.toLowerCase().replace(/ /g, '-')}`}
+                          onClick={() => setActiveMenu(null)}
+                          className="hover:text-[#C5A059] transition-colors"
+                        >
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+
+            {/* BOTTOM VALUE PROPOSITION BANNER WITH DECORATIVE GOLD ICONS */}
+            <div className="grid grid-cols-5 gap-4 pt-6 border-t border-[#E8DFC8]">
+              <div className="flex items-center gap-3 bg-white p-3 border border-[#E8DFC8] rounded-xs">
+                <Heart className="w-4 h-4 text-[#C5A059] shrink-0" />
+                <div>
+                  <h5 className="text-[10px] font-bold uppercase text-gray-900">Curated With Love</h5>
+                  <p className="text-[9px] text-gray-500">Handpicked for you</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 bg-white p-3 border border-[#E8DFC8] rounded-xs">
+                <Flower2 className="w-4 h-4 text-[#C5A059] shrink-0" />
+                <div>
+                  <h5 className="text-[10px] font-bold uppercase text-gray-900">Artisan Made</h5>
+                  <p className="text-[9px] text-gray-500">Support local artisans</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 bg-white p-3 border border-[#E8DFC8] rounded-xs">
+                <Sparkles className="w-4 h-4 text-[#C5A059] shrink-0" />
+                <div>
+                  <h5 className="text-[10px] font-bold uppercase text-gray-900">Sustainable Choices</h5>
+                  <p className="text-[9px] text-gray-500">Better for tomorrow</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 bg-white p-3 border border-[#E8DFC8] rounded-xs">
+                <Gem className="w-4 h-4 text-[#C5A059] shrink-0" />
+                <div>
+                  <h5 className="text-[10px] font-bold uppercase text-gray-900">Premium Quality</h5>
+                  <p className="text-[9px] text-gray-500">Made to last</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 bg-white p-3 border border-[#E8DFC8] rounded-xs">
+                <Package className="w-4 h-4 text-[#C5A059] shrink-0" />
+                <div>
+                  <h5 className="text-[10px] font-bold uppercase text-gray-900">Secure Packaging</h5>
+                  <p className="text-[9px] text-gray-500">Packed with care</p>
+                </div>
               </div>
             </div>
 
-            {/* Featured Luxury Banner Image */}
-            <div className="relative group overflow-hidden rounded-xs border border-[#E8DFC8]">
-              <img
-                src="/images/cat_decor_accents.jpg"
-                alt="Luxury Gifting House"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-6 text-white">
-                <span className="text-[9px] font-bold tracking-[0.25em] uppercase text-amber-200 mb-1">
-                  Artisan House
-                </span>
-                <h4 className="font-serif text-lg font-bold mb-1">Timeless Indian Craftsmanship</h4>
-                <p className="text-xs text-slate-200 font-light">Elevating meaningful moments.</p>
-              </div>
-            </div>
           </div>
         </div>
       )}

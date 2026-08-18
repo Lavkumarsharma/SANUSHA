@@ -16,6 +16,9 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Toast } from '@/components/Toast';
 import { HeroCarousel } from '@/components/HeroCarousel';
+import { MeaningMeter } from '@/components/MeaningMeter';
+import { GiftFinder } from '@/components/GiftFinder';
+import { TrustBar } from '@/components/TrustBar';
 import { useStore, PRODUCTS_DATA, getProductImage } from '@/store/useStore';
 import { fetchApi, getImageUrl } from '@/lib/api';
 
@@ -214,34 +217,14 @@ export default function StorefrontHomePage() {
         {/* Optimized Edge-to-Edge Hero Carousel */}
         <HeroCarousel slides={heroSlides} renderStyledTitle={renderStyledHeroTitle} />
 
-        {/* Brand Value Propositions */}
-        <section className="bg-[#FAF8F5] border-y border-[#EBE7DF] py-8 px-4 sm:px-8">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div className="flex items-center justify-center gap-3">
-              <Truck className="w-5 h-5 text-[#6C307D]" />
-              <div className="text-left">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900">Free Express Shipping</h4>
-                <p className="text-[11px] text-gray-500 font-medium">On all orders above ₹999</p>
-              </div>
-            </div>
+        {/* 1. Dark Luxury Meaning Meter Bar */}
+        <MeaningMeter />
 
-            <div className="flex items-center justify-center gap-3 border-y md:border-y-0 md:border-x border-[#EBE7DF] py-4 md:py-0">
-              <ShieldCheck className="w-5 h-5 text-[#6C307D]" />
-              <div className="text-left">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900">100% Authentic Quality</h4>
-                <p className="text-[11px] text-gray-500 font-medium">European flax & organic dyes</p>
-              </div>
-            </div>
+        {/* 2. Interactive 4-Step Gift Finder */}
+        <GiftFinder />
 
-            <div className="flex items-center justify-center gap-3">
-              <RotateCcw className="w-5 h-5 text-[#6C307D]" />
-              <div className="text-left">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900">Hassle-Free Returns</h4>
-                <p className="text-[11px] text-gray-500 font-medium">14-day easy return policy</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* 3. Bottom Trust Bar */}
+        <TrustBar />
 
         {/* Dynamic Category Tiles */}
         <section className="max-w-7xl mx-auto px-4 sm:px-8 py-14 sm:py-20 space-y-8">
