@@ -1,11 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { fetchApi, getImageUrl } from '@/lib/api';
 
 export const Footer: React.FC = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [email, setEmail] = useState('');
+  const [brandConfig, setBrandConfig] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('sanusha_cms_brand_cache');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return {
+      brandName: 'SANUSHA',
+      tagline: 'Thoughtful Gifting, Timeless Craft.',
+      shortDescription: 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.',
+      logoUrl: '',
+      footerLogoUrl: '',
+    };
+  });
+
+  useEffect(() => {
+    fetchApi('/cms/brand')
+      .then((data) => {
+        if (data && data.brandName) {
+          setBrandConfig(data);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('sanusha_cms_brand_cache', JSON.stringify(data));
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,17 +52,25 @@ export const Footer: React.FC = () => {
         {/* COLUMN 1: ABOUT SANUSHA */}
         <div className="lg:col-span-2 space-y-4 pr-0 lg:pr-8">
           <Link href="/" className="inline-block group">
-            <span className="font-serif text-2xl font-bold tracking-[0.25em] uppercase text-gray-900 group-hover:text-[#C5A059] transition-colors">
-              SANUSHA
-            </span>
+            {getImageUrl(brandConfig.footerLogoUrl || brandConfig.logoUrl) ? (
+              <img
+                src={getImageUrl(brandConfig.footerLogoUrl || brandConfig.logoUrl)}
+                alt={brandConfig.brandName || 'SANUSHA'}
+                className="h-8 lg:h-10 w-auto object-contain"
+              />
+            ) : (
+              <span className="font-serif text-2xl lg:text-3xl font-extrabold tracking-[0.28em] uppercase text-gray-900 group-hover:text-[#C5A059] transition-colors duration-300">
+                {brandConfig.brandName || 'SANUSHA'}
+              </span>
+            )}
           </Link>
 
           <p className="font-serif italic text-sm text-[#8C7A5A] font-medium">
-            Thoughtful Gifting, Timeless Craft.
+            {brandConfig.tagline || 'Thoughtful Gifting, Timeless Craft.'}
           </p>
 
           <p className="text-gray-600 leading-relaxed font-sans text-xs max-w-md pt-1">
-            Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.
+            {brandConfig.shortDescription || 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.'}
           </p>
         </div>
 
