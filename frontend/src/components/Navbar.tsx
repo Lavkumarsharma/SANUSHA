@@ -130,7 +130,9 @@ export const Navbar: React.FC = () => {
       if (data && data.brandName) {
         setHeaderConfig(data);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+          try {
+            localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+          } catch (e) {}
         }
       } else if (brandData && brandData.brandName) {
         setHeaderConfig((prev: any) => ({ ...prev, ...brandData }));
@@ -176,21 +178,21 @@ export const Navbar: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Filter live search results
+  // Filter live search results with bulletproof type safety
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
       return;
     }
     const q = searchQuery.toLowerCase().trim();
-    const matches = allProducts.filter(
-      (p) =>
-        p.title?.toLowerCase().includes(q) ||
-        p.name?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q) ||
-        p.badge?.toLowerCase().includes(q)
-    );
+    const matches = (allProducts || []).filter((p) => {
+      if (!p) return false;
+      const title = String(p.title || p.name || '').toLowerCase();
+      const desc = String(p.description || '').toLowerCase();
+      const category = typeof p.category === 'string' ? p.category.toLowerCase() : (p.category?.name ? String(p.category.name).toLowerCase() : '');
+      const badge = String(p.badge || '').toLowerCase();
+      return title.includes(q) || desc.includes(q) || category.includes(q) || badge.includes(q);
+    });
     setSearchResults(matches.slice(0, 6));
   }, [searchQuery, allProducts]);
 

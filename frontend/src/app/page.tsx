@@ -150,7 +150,9 @@ export default function StorefrontHomePage() {
         });
         setHeroSlides(activeSlides);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(activeSlides));
+          try {
+            localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(activeSlides));
+          } catch (storageErr) {}
         }
       }
     };
