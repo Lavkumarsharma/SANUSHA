@@ -108,17 +108,32 @@ export const Navbar: React.FC = () => {
     };
   });
 
-  // Load products & header settings
+  const [rotatingPlaceholders, setRotatingPlaceholders] = useState<string[]>(ROTATING_PLACEHOLDERS);
+  const [popularSearchesList, setPopularSearchesList] = useState<string[]>(POPULAR_SEARCHES);
+
+  // Load products, header, search & brand settings
   useEffect(() => {
     Promise.all([
       fetchApi('/products').catch(() => FALLBACK_PRODUCTS),
       fetchApi('/cms/header').catch(() => null),
-    ]).then(([prods, data]) => {
+      fetchApi('/cms/search').catch(() => null),
+      fetchApi('/cms/brand').catch(() => null),
+    ]).then(([prods, data, searchData, brandData]) => {
       if (prods && prods.length > 0) setAllProducts(prods);
       if (data && data.brandName) {
         setHeaderConfig(data);
         if (typeof window !== 'undefined') {
           localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+        }
+      } else if (brandData && brandData.brandName) {
+        setHeaderConfig((prev: any) => ({ ...prev, ...brandData }));
+      }
+      if (searchData) {
+        if (searchData.placeholders && searchData.placeholders.length > 0) {
+          setRotatingPlaceholders(searchData.placeholders);
+        }
+        if (searchData.popularSearches && searchData.popularSearches.length > 0) {
+          setPopularSearchesList(searchData.popularSearches);
         }
       }
     });
@@ -439,7 +454,7 @@ export const Navbar: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={ROTATING_PLACEHOLDERS[placeholderIndex]}
+                placeholder={rotatingPlaceholders[placeholderIndex % rotatingPlaceholders.length]}
                 className="w-full bg-transparent text-sm font-sans font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none"
               />
               <button
@@ -461,7 +476,7 @@ export const Navbar: React.FC = () => {
                   Popular Searches
                 </span>
                 <div className="flex flex-wrap gap-2">
-                  {POPULAR_SEARCHES.map((item, idx) => (
+                  {popularSearchesList.map((item, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSearchSelect(item)}

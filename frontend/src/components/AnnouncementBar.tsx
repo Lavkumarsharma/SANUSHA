@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { fetchApi } from '@/lib/api';
 
-const ANNOUNCEMENTS = [
+const DEFAULT_ANNOUNCEMENTS = [
   'Handcrafted In India',
   'Thoughtfully Curated Collections',
   'Gift-Ready Luxury Packaging',
@@ -10,19 +11,45 @@ const ANNOUNCEMENTS = [
 ];
 
 export const AnnouncementBar: React.FC = () => {
+  const [announcements, setAnnouncements] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('sanusha_cms_announcements_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return DEFAULT_ANNOUNCEMENTS;
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
+    fetchApi('/cms/announcements')
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setAnnouncements(data);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('sanusha_cms_announcements_cache', JSON.stringify(data));
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (announcements.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length);
+      setCurrentIndex((prev) => (prev + 1) % announcements.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [announcements]);
 
   return (
     <div className="bg-[#FAF7F2] border-b border-[#E8DFC8] text-gray-800 text-[10px] sm:text-[11px] py-2 px-4 select-none">
       <div className="max-w-7xl mx-auto flex items-center justify-center relative overflow-hidden h-4">
-        {ANNOUNCEMENTS.map((text, index) => {
+        {announcements.map((text, index) => {
           const isActive = index === currentIndex;
           return (
             <div

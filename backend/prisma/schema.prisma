@@ -202,3 +202,64 @@ model Coupon {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
+
+model NavigationMenu {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  title            String
+  slug             String
+  url              String
+  icon             String?
+  parentId         String?
+  sortOrder        Int      @default(0)
+  isActive         Boolean  @default(true)
+  megaMenuJson     String   @default("[]")
+  isMobileSeparate Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model AnnouncementBarItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  icon      String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  startDate String?
+  endDate   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SearchSettingItem {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  placeholdersJson      String   @default("[]")
+  trendingKeywordsJson  String   @default("[]")
+  suggestedSearchesJson String   @default("[]")
+  featuredSearchesJson  String   @default("[]")
+  updatedAt             DateTime @updatedAt
+}
+
+model BrandSettingItem {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  brandName        String   @default("SANUSHA")
+  logo             String?
+  favicon          String?
+  footerLogo       String?
+  tagline          String?  @default("Thoughtful Gifting, Timeless Craft.")
+  shortDescription String?  @default("Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.")
+  email            String?  @default("concierge@sanusha.com")
+  phone            String?  @default("+91 98765 43210")
+  address          String?  @default("SANUSHA Luxury House, New Delhi, India")
+  socialLinksJson  String   @default("{}")
+  updatedAt        DateTime @updatedAt
+}
+
+model FooterSettingItem {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  columnsJson           String   @default("[]")
+  linksJson             String   @default("[]")
+  newsletterTitle       String   @default("Stay Inspired")
+  newsletterDescription String   @default("Receive curated stories, gifting inspiration, and exclusive collections.")
+  copyrightText         String   @default("© 2026 SANUSHA Luxury Gifting House. All rights reserved.")
+  updatedAt             DateTime @updatedAt
+}
