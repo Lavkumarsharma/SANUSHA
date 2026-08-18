@@ -1,158 +1,177 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { fetchApi, getImageUrl } from '@/lib/api';
 
 export const Footer: React.FC = () => {
-  const [footerConfig, setFooterConfig] = useState({
-    brandDescription: 'Timeless fashion, crafted with purpose. Designed to empower. Made to last.',
-    col1Title: 'SHOP',
-    col1Links: [
-      { id: '1', label: 'All Products', url: '/shop' },
-      { id: '2', label: "Women's Collection", url: '/category/women' },
-      { id: '3', label: "Men's Collection", url: '/category/men' },
-      { id: '4', label: 'New Arrivals', url: '/shop' },
-    ],
-    col2Title: 'CUSTOMER CARE',
-    col2Links: [
-      { id: '1', label: 'My Account', url: '/account' },
-      { id: '2', label: 'Wishlist', url: '/wishlist' },
-      { id: '3', label: 'Shopping Cart', url: '/cart' },
-    ],
-    newsletterTitle: 'NEWSLETTER',
-    newsletterSubtitle: 'Subscribe & get 10% off your first order.',
-    newsletterButtonText: 'JOIN',
-    copyrightText: '© 2026 SANUSHA Enterprise Platform. All rights reserved.',
-  });
+  const [subscribed, setSubscribed] = useState(false);
+  const [email, setEmail] = useState('');
 
-  const [headerConfig, setHeaderConfig] = useState<any>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cachedHdr = localStorage.getItem('sanusha_cms_header_cache');
-        if (cachedHdr) {
-          const parsed = JSON.parse(cachedHdr);
-          if (parsed && parsed.brandName) return parsed;
-        }
-      } catch (e) {}
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setSubscribed(true);
+      setEmail('');
+      setTimeout(() => setSubscribed(false), 4000);
     }
-    return {
-      brandName: 'SANUSHA',
-      iconUrl: '',
-      logoUrl: '',
-    };
-  });
-
-  useEffect(() => {
-    Promise.all([
-      fetchApi('/cms/footer').catch(() => null),
-      fetchApi('/cms/header').catch(() => null),
-    ]).then(([ftr, hdr]) => {
-      if (ftr) {
-        setFooterConfig((prev: any) => ({
-          ...prev,
-          ...ftr,
-          col1Links: ftr.col1Links !== undefined ? ftr.col1Links : prev.col1Links,
-          col2Links: ftr.col2Links !== undefined ? ftr.col2Links : prev.col2Links,
-        }));
-      }
-      if (hdr && hdr.brandName) {
-        setHeaderConfig(hdr);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(hdr));
-        }
-      }
-    });
-  }, []);
+  };
 
   return (
-    <footer className="bg-[#FAF8F5] border-t border-[#EBE7DF] pt-14 pb-8 px-4 sm:px-8 text-xs text-gray-700">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-        {/* Brand Tagline & Dual Logo Display */}
-        <div className="space-y-3">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            {getImageUrl(headerConfig.iconUrl) ? (
-              <img src={getImageUrl(headerConfig.iconUrl)} alt="Brand Icon" className="h-9 w-auto object-contain" />
-            ) : null}
-            {getImageUrl(headerConfig.logoUrl) ? (
-              <img src={getImageUrl(headerConfig.logoUrl)} alt={headerConfig.brandName} className="h-9 w-auto object-contain" />
-            ) : (
-              <span className="font-serif text-2xl font-bold tracking-[0.2em] text-gray-900 block group-hover:text-[#6C307D] transition-colors">
-                {headerConfig.brandName}
-              </span>
-            )}
+    <footer className="bg-[#FAF7F2] border-t border-[#E8DFC8] pt-16 pb-12 px-6 sm:px-10 lg:px-16 text-xs text-gray-700">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 mb-16">
+        
+        {/* COLUMN 1: ABOUT SANUSHA */}
+        <div className="lg:col-span-2 space-y-4 pr-0 lg:pr-8">
+          <Link href="/" className="inline-block group">
+            <span className="font-serif text-2xl font-bold tracking-[0.25em] uppercase text-gray-900 group-hover:text-[#C5A059] transition-colors">
+              SANUSHA
+            </span>
           </Link>
 
-          <p className="text-gray-600 leading-relaxed font-medium">
-            {footerConfig.brandDescription}
+          <p className="font-serif italic text-sm text-[#8C7A5A] font-medium">
+            Thoughtful Gifting, Timeless Craft.
+          </p>
+
+          <p className="text-gray-600 leading-relaxed font-sans text-xs max-w-md pt-1">
+            Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.
           </p>
         </div>
 
-        {/* Column 1 Links */}
+        {/* COLUMN 2: SHOP */}
         <div>
-          <h4 className="font-bold text-gray-900 uppercase tracking-widest mb-3">
-            {footerConfig.col1Title}
+          <h4 className="font-serif text-xs font-bold text-gray-900 uppercase tracking-[0.2em] mb-4 border-b border-[#E8DFC8] pb-1 inline-block">
+            Shop
           </h4>
-          <ul className="space-y-2 text-gray-600 font-medium">
-            {(footerConfig.col1Links || []).map((link, idx) => (
-              <li key={link.id || idx}>
-                <Link href={link.url} className="hover:text-[#6C307D]">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+          <ul className="space-y-2.5 text-gray-600 font-sans font-medium">
+            <li>
+              <Link href="/shop?filter=gifts" className="hover:text-[#C5A059] transition-colors">
+                Gifts
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?filter=collections" className="hover:text-[#C5A059] transition-colors">
+                Collections
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?filter=occasions" className="hover:text-[#C5A059] transition-colors">
+                Occasions
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?filter=new-arrivals" className="hover:text-[#C5A059] transition-colors">
+                New Arrivals
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?filter=gift-boxes" className="hover:text-[#C5A059] transition-colors">
+                Gift Boxes
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Column 2 Links */}
+        {/* COLUMN 3: CUSTOMER CARE */}
         <div>
-          <h4 className="font-bold text-gray-900 uppercase tracking-widest mb-3">
-            {footerConfig.col2Title}
+          <h4 className="font-serif text-xs font-bold text-gray-900 uppercase tracking-[0.2em] mb-4 border-b border-[#E8DFC8] pb-1 inline-block">
+            Customer Care
           </h4>
-          <ul className="space-y-2 text-gray-600 font-medium">
-            {(footerConfig.col2Links || []).map((link, idx) => (
-              <li key={link.id || idx}>
-                {link.url && link.url.startsWith('http') ? (
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#6C307D] font-bold text-[#6C307D]"
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  <Link href={link.url || '/'} className="hover:text-[#6C307D]">
-                    {link.label}
-                  </Link>
-                )}
-              </li>
-            ))}
+          <ul className="space-y-2.5 text-gray-600 font-sans font-medium">
+            <li>
+              <Link href="/account" className="hover:text-[#C5A059] transition-colors">
+                Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link href="/account" className="hover:text-[#C5A059] transition-colors">
+                Shipping
+              </Link>
+            </li>
+            <li>
+              <Link href="/account" className="hover:text-[#C5A059] transition-colors">
+                Returns
+              </Link>
+            </li>
+            <li>
+              <Link href="/account" className="hover:text-[#C5A059] transition-colors">
+                FAQs
+              </Link>
+            </li>
+            <li>
+              <Link href="/account" className="hover:text-[#C5A059] transition-colors">
+                Track Order
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Newsletter Section */}
+        {/* COLUMN 4: DISCOVER */}
         <div>
-          <h4 className="font-bold text-gray-900 uppercase tracking-widest mb-3">
-            {footerConfig.newsletterTitle}
+          <h4 className="font-serif text-xs font-bold text-gray-900 uppercase tracking-[0.2em] mb-4 border-b border-[#E8DFC8] pb-1 inline-block">
+            Discover
           </h4>
-          <p className="text-gray-600 mb-3">{footerConfig.newsletterSubtitle}</p>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="bg-white border border-[#EBE7DF] rounded-xs px-3 py-2 text-xs w-full focus:outline-none focus:border-[#6C307D]"
-            />
-            <button className="bg-[#6C307D] text-white px-4 py-2 font-bold uppercase rounded-xs hover:bg-[#522061] transition-colors">
-              {footerConfig.newsletterButtonText}
-            </button>
-          </div>
+          <ul className="space-y-2.5 text-gray-600 font-sans font-medium">
+            <li>
+              <Link href="/stories" className="hover:text-[#C5A059] transition-colors">
+                Journal
+              </Link>
+            </li>
+            <li>
+              <Link href="/stories#artisan" className="hover:text-[#C5A059] transition-colors">
+                Artisan Stories
+              </Link>
+            </li>
+            <li>
+              <Link href="/stories#guides" className="hover:text-[#C5A059] transition-colors">
+                Gift Guides
+              </Link>
+            </li>
+            <li>
+              <Link href="/stories#sustainability" className="hover:text-[#C5A059] transition-colors">
+                Sustainability
+              </Link>
+            </li>
+          </ul>
         </div>
+
       </div>
 
-      {/* Clean Copyright Notice */}
-      <div className="max-w-7xl mx-auto pt-6 border-t border-[#EBE7DF] text-center text-[11px] text-gray-500 font-medium">
-        <p>{footerConfig.copyrightText}</p>
+      {/* NEWSLETTER SECTION */}
+      <div className="max-w-[1440px] mx-auto border-t border-[#E8DFC8] pt-12 pb-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 className="font-serif text-lg font-bold text-gray-900 tracking-wider uppercase mb-1">
+            Stay Inspired
+          </h3>
+          <p className="text-gray-600 font-sans text-xs">
+            Receive curated stories, gifting inspiration, and exclusive collections.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubscribe} className="flex gap-2 max-w-md md:ml-auto w-full">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email address"
+            required
+            className="bg-white border border-[#E8DFC8] rounded-xs px-4 py-2.5 text-xs w-full text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#C5A059] transition-colors"
+          />
+          <button
+            type="submit"
+            className="bg-[#C5A059] hover:bg-[#B38D48] text-white px-6 py-2.5 font-bold uppercase tracking-widest text-[11px] rounded-xs transition-colors shadow-xs whitespace-nowrap"
+          >
+            {subscribed ? 'Subscribed' : 'Subscribe'}
+          </button>
+        </form>
+      </div>
+
+      {/* BOTTOM COPYRIGHT BAR */}
+      <div className="max-w-[1440px] mx-auto border-t border-[#E8DFC8] pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 font-sans gap-2">
+        <p>© 2026 SANUSHA Luxury Gifting House. All rights reserved.</p>
+        <div className="flex items-center space-x-6 text-gray-500 font-medium">
+          <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms of Service</Link>
+        </div>
       </div>
     </footer>
   );
