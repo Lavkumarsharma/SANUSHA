@@ -90,8 +90,26 @@ const upload = multer({ storage });
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use('/uploads', express.static(uploadsDir));
-app.use('/images', express.static(imagesDir));
+app.use(
+  '/uploads',
+  express.static(uploadsDir, {
+    maxAge: '1y',
+    immutable: true,
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    },
+  })
+);
+app.use(
+  '/images',
+  express.static(imagesDir, {
+    maxAge: '1y',
+    immutable: true,
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    },
+  })
+);
 
 
 // Auth Middleware (Soft authentication allowing seamless updates)

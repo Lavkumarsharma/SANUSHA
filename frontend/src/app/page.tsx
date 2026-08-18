@@ -15,6 +15,7 @@ import { AnnouncementBar } from '@/components/AnnouncementBar';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Toast } from '@/components/Toast';
+import { HeroCarousel } from '@/components/HeroCarousel';
 import { useStore, PRODUCTS_DATA, getProductImage } from '@/store/useStore';
 import { fetchApi, getImageUrl } from '@/lib/api';
 
@@ -221,109 +222,8 @@ export default function StorefrontHomePage() {
       <Navbar />
 
       <main className="flex-grow">
-        {/* Dynamic 100% Edge-to-Edge Full Hero Carousel Container */}
-        <section className="relative w-full aspect-[3/4] sm:aspect-[16/9] min-h-[480px] sm:min-h-[420px] max-h-[85vh] bg-[#EAE7DF] overflow-hidden">
-          {heroSlides.map((slide, idx) => {
-            const isCurrent = idx === currentSlideIdx;
-            const hasTextContent = !!(slide.title?.trim() || slide.subtitle?.trim() || slide.badgeText?.trim());
-            const shouldShowOverlay = slide.showOverlay === true && hasTextContent;
-            const rawDesktop = slide.bannerUrl || '';
-            const rawMobile = slide.mobileBannerUrl || '';
-            const desktopImgSrc = getImageUrl(rawDesktop) || '/images/decor_hero_banner.jpg';
-            const mobileImgSrc = getImageUrl(rawMobile) || '';
-
-            return (
-              <div
-                key={slide.id || idx}
-                className={`absolute inset-0 transition-opacity duration-1000 ${
-                  isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                }`}
-              >
-                {/* Desktop Banner Image */}
-                <img
-                  src={desktopImgSrc}
-                  alt={slide.title || 'SANUSHA Hero Banner'}
-                  className={`w-full h-full object-cover object-top sm:object-center transition-transform duration-700 ${
-                    mobileImgSrc ? 'hidden sm:block' : 'block'
-                  }`}
-                  style={{ imageRendering: 'auto' as any }}
-                  loading="eager"
-                  fetchPriority="high"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/decor_hero_banner.jpg';
-                  }}
-                />
-
-                {/* Dedicated Mobile Phone Banner Image */}
-                {mobileImgSrc && (
-                  <img
-                    src={mobileImgSrc}
-                    alt={slide.title || 'SANUSHA Mobile Hero Banner'}
-                    className="block sm:hidden w-full h-full object-cover object-top sm:object-center transition-transform duration-700"
-                    style={{ imageRendering: 'auto' as any }}
-                    loading="eager"
-                    fetchPriority="high"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/decor_hero_banner.jpg';
-                    }}
-                  />
-                )}
-
-                {/* Render Text Overlay ONLY IF showOverlay is TRUE and text exists */}
-                {shouldShowOverlay && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent flex items-center">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full">
-                      <div className="max-w-md sm:max-w-xl text-left text-white space-y-4">
-                        {slide.badgeText && (
-                          <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-amber-200 text-[10px] font-extrabold tracking-[0.3em] uppercase px-3.5 py-1.5 rounded-full border border-amber-300/30 shadow-md">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                            {slide.badgeText}
-                          </span>
-                        )}
-
-                        {slide.title && renderStyledHeroTitle(slide.title)}
-
-                        {slide.subtitle && (
-                          <p className="text-base sm:text-lg text-slate-200 font-light leading-relaxed drop-shadow-md max-w-lg pt-1">
-                            {slide.subtitle}
-                          </p>
-                        )}
-
-                        {slide.buttonText && (
-                          <div className="pt-3">
-                            <Link
-                              href={slide.buttonLink || '/shop'}
-                              className="inline-flex items-center gap-3 bg-white hover:bg-[#6C307D] text-gray-900 hover:text-white text-xs font-extrabold uppercase tracking-[0.2em] px-8 py-4 rounded-xs shadow-2xl transition-all duration-300 hover:scale-[1.03] border border-white/40"
-                            >
-                              <span>{slide.buttonText}</span>
-                              <ArrowRight className="w-4 h-4" />
-                            </Link>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Slider Dots Indicator */}
-          {heroSlides.length > 1 && (
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-              {heroSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlideIdx(idx)}
-                  className={`h-2 rounded-full transition-all ${
-                    idx === currentSlideIdx ? 'w-8 bg-white shadow-md' : 'w-2 bg-white/50 hover:bg-white/80'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+        {/* Optimized Edge-to-Edge Hero Carousel */}
+        <HeroCarousel slides={heroSlides} renderStyledTitle={renderStyledHeroTitle} />
 
         {/* Brand Value Propositions */}
         <section className="bg-[#FAF8F5] border-y border-[#EBE7DF] py-8 px-4 sm:px-8">

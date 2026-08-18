@@ -46,6 +46,11 @@ export function getImageUrl(url: string | undefined | null): string {
     return `${effectiveHost}${trimmed}`;
   }
 
+  // Cloudinary / Edge CDN auto format (f_auto) & compression (q_auto) injection
+  if (trimmed.includes('cloudinary.com') && trimmed.includes('/upload/') && !trimmed.includes('f_auto')) {
+    return trimmed.replace('/upload/', '/upload/f_auto,q_auto/');
+  }
+
   return trimmed;
 }
 
