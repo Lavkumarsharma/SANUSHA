@@ -113,19 +113,7 @@ export default function StorefrontHomePage() {
         }
       } catch (e) {}
     }
-    return [
-      {
-        id: 'slide-1',
-        title: 'CRAFTED WITH MEANING.',
-        subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
-        badgeText: 'HANDCRAFTED LUXURY',
-        bannerUrl: '/images/decor_hero_banner.jpg',
-        buttonText: 'EXPLORE COLLECTION',
-        buttonLink: '/shop',
-        showOverlay: true,
-        active: true,
-      },
-    ];
+    return [];
   });
   const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 

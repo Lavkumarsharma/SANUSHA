@@ -21,10 +21,6 @@ export function getImageUrl(url: string | undefined | null): string {
     return trimmed;
   }
 
-  // Legacy fallback override for hero_banner.jpg -> decor_hero_banner.jpg
-  if (trimmed.includes('hero_banner.jpg')) {
-    return '/images/decor_hero_banner.jpg';
-  }
 
   // Local public images should load directly from the Next.js static asset public directory
   if (trimmed.startsWith('/images/')) {

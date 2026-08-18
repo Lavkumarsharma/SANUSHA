@@ -105,7 +105,13 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
     };
   }, [totalSlides, isPaused, autoPlayInterval, nextSlide]);
 
-  if (totalSlides === 0) return null;
+  if (totalSlides === 0) {
+    return (
+      <section className="relative w-full aspect-[3/4] sm:aspect-[16/9] min-h-[480px] sm:min-h-[420px] max-h-[85vh] bg-[#F5F2EB] animate-pulse flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-amber-400/40 border-t-amber-600 animate-spin" />
+      </section>
+    );
+  }
 
   return (
     <section
