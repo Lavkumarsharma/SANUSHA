@@ -35,10 +35,10 @@ const memoryCMSStore = {
   hero: [
     {
       id: 'slide-1',
-      title: 'TIMELESS ELEGANCE & MODERN PURITY',
-      subtitle: 'Thoughtful designs, handcrafted treasures and timeless details made to be cherished.',
-      badgeText: 'LUXURY COLLECTION',
-      bannerUrl: '/images/hero_banner.jpg',
+      title: 'CRAFTED WITH MEANING.',
+      subtitle: 'Thoughtful gifts, handcrafted treasures and timeless details made to be cherished.',
+      badgeText: 'HANDCRAFTED LUXURY',
+      bannerUrl: '/images/decor_hero_banner.jpg',
       mobileBannerUrl: '',
       buttonText: 'EXPLORE COLLECTION',
       buttonLink: '/shop',
@@ -1006,7 +1006,7 @@ app.get('/api/cms/hero', async (req: any, res: any) => {
           if (typeof bUrl === 'string' && bUrl.includes('/uploads/') && !bUrl.startsWith('data:')) {
             const fname = bUrl.split('/uploads/')[1];
             if (fname && !fs.existsSync(path.join(uploadsDir, fname))) {
-              bUrl = '/images/hero_banner.jpg';
+              bUrl = '/images/decor_hero_banner.jpg';
             }
           }
           if (typeof mbUrl === 'string' && mbUrl.includes('/uploads/') && !mbUrl.startsWith('data:')) {
@@ -1015,7 +1015,7 @@ app.get('/api/cms/hero', async (req: any, res: any) => {
               mbUrl = '';
             }
           }
-          if (!bUrl) bUrl = '/images/hero_banner.jpg';
+          if (!bUrl) bUrl = '/images/decor_hero_banner.jpg';
 
           return {
             ...slide,
