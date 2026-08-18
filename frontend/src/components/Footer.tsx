@@ -10,8 +10,16 @@ export const Footer: React.FC = () => {
   const [brandConfig, setBrandConfig] = useState<any>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const cached = localStorage.getItem('sanusha_cms_brand_cache');
-        if (cached) return JSON.parse(cached);
+        const cachedBrand = localStorage.getItem('sanusha_cms_brand_cache');
+        const cachedHeader = localStorage.getItem('sanusha_cms_header_cache');
+        const parsedHeader = cachedHeader ? JSON.parse(cachedHeader) : null;
+        const parsedBrand = cachedBrand ? JSON.parse(cachedBrand) : null;
+        return {
+          brandName: parsedHeader?.brandName || parsedBrand?.brandName || 'SANUSHA',
+          tagline: parsedBrand?.tagline || 'Thoughtful Gifting, Timeless Craft.',
+          shortDescription: parsedBrand?.shortDescription || 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.',
+          logoUrl: parsedHeader?.logoUrl || parsedBrand?.logoUrl || parsedBrand?.footerLogoUrl || '',
+        };
       } catch (e) {}
     }
     return {
@@ -19,21 +27,22 @@ export const Footer: React.FC = () => {
       tagline: 'Thoughtful Gifting, Timeless Craft.',
       shortDescription: 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.',
       logoUrl: '',
-      footerLogoUrl: '',
     };
   });
 
   useEffect(() => {
-    fetchApi('/cms/brand')
-      .then((data) => {
-        if (data && data.brandName) {
-          setBrandConfig(data);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('sanusha_cms_brand_cache', JSON.stringify(data));
-          }
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      fetchApi('/cms/header').catch(() => null),
+      fetchApi('/cms/brand').catch(() => null),
+    ]).then(([headerData, brandData]) => {
+      setBrandConfig((prev: any) => ({
+        ...prev,
+        brandName: headerData?.brandName || brandData?.brandName || prev.brandName,
+        logoUrl: headerData?.logoUrl || brandData?.footerLogoUrl || brandData?.logoUrl || prev.logoUrl,
+        tagline: brandData?.tagline || prev.tagline,
+        shortDescription: brandData?.shortDescription || prev.shortDescription,
+      }));
+    });
   }, []);
 
   const handleSubscribe = (e: React.FormEvent) => {
@@ -45,6 +54,8 @@ export const Footer: React.FC = () => {
     }
   };
 
+  const logoImageUrl = getImageUrl(brandConfig.logoUrl);
+
   return (
     <footer className="bg-[#FAF7F2] border-t border-[#E8DFC8] pt-16 pb-12 px-6 sm:px-10 lg:px-16 text-xs text-gray-700">
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 mb-16">
@@ -52,9 +63,9 @@ export const Footer: React.FC = () => {
         {/* COLUMN 1: ABOUT SANUSHA */}
         <div className="lg:col-span-2 space-y-4 pr-0 lg:pr-8">
           <Link href="/" className="inline-block group">
-            {getImageUrl(brandConfig.footerLogoUrl || brandConfig.logoUrl) ? (
+            {logoImageUrl ? (
               <img
-                src={getImageUrl(brandConfig.footerLogoUrl || brandConfig.logoUrl)}
+                src={logoImageUrl}
                 alt={brandConfig.brandName || 'SANUSHA'}
                 className="h-8 lg:h-10 w-auto object-contain"
               />
