@@ -280,23 +280,25 @@ export const Navbar: React.FC = () => {
               </Link>
             </div>
 
-            {/* SEARCH TRIGGER BUTTON (BOLD TEXT ONLY) */}
+            {/* SEARCH TRIGGER BUTTON */}
             <button
               onClick={() => {
                 setIsSearchOpen(true);
                 setTimeout(() => searchInputRef.current?.focus(), 100);
               }}
-              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 group"
+              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 flex items-center gap-1.5 group"
             >
+              <Search className="w-3.5 h-3.5 text-[#C5A059]" />
               <span>SEARCH</span>
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#C5A059] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-left" />
             </button>
 
-            {/* ACCOUNT BUTTON (BOLD TEXT ONLY - ALWAYS SHOW ACCOUNT) */}
+            {/* ACCOUNT BUTTON */}
             <Link
               href={customerUser ? '/account' : '/login'}
-              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 group"
+              className="relative text-[11px] font-sans font-bold tracking-[0.25em] text-gray-900 uppercase transition-colors duration-200 py-1 flex items-center gap-1.5 group"
             >
+              <User className="w-3.5 h-3.5 text-gray-800 group-hover:text-[#C5A059] transition-colors" />
               <span>ACCOUNT</span>
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#C5A059] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out origin-left" />
             </Link>
