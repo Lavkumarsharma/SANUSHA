@@ -7,30 +7,32 @@ import { fetchApi, getImageUrl } from '@/lib/api';
 export const Footer: React.FC = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [email, setEmail] = useState('');
-  const [brandConfig, setBrandConfig] = useState<any>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cachedBrand = localStorage.getItem('sanusha_cms_brand_cache');
-        const cachedHeader = localStorage.getItem('sanusha_cms_header_cache');
-        const parsedHeader = cachedHeader ? JSON.parse(cachedHeader) : null;
-        const parsedBrand = cachedBrand ? JSON.parse(cachedBrand) : null;
-        return {
-          brandName: parsedHeader?.brandName || parsedBrand?.brandName || 'SANUSHA',
-          tagline: parsedBrand?.tagline || 'Thoughtful Gifting, Timeless Craft.',
-          shortDescription: parsedBrand?.shortDescription || 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.',
-          logoUrl: parsedHeader?.logoUrl || parsedBrand?.logoUrl || parsedBrand?.footerLogoUrl || '',
-        };
-      } catch (e) {}
-    }
-    return {
-      brandName: 'SANUSHA',
-      tagline: 'Thoughtful Gifting, Timeless Craft.',
-      shortDescription: 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.',
-      logoUrl: '',
-    };
+  const [brandConfig, setBrandConfig] = useState<any>({
+    brandName: 'SANUSHA',
+    tagline: 'Thoughtful Gifting, Timeless Craft.',
+    shortDescription: 'Thoughtfully curated gifts and handcrafted treasures designed to celebrate meaningful moments.',
+    logoUrl: '',
   });
 
   useEffect(() => {
+    // 1. Client-side localStorage hydration after initial render
+    try {
+      const cachedBrand = localStorage.getItem('sanusha_cms_brand_cache');
+      const cachedHeader = localStorage.getItem('sanusha_cms_header_cache');
+      const parsedHeader = cachedHeader ? JSON.parse(cachedHeader) : null;
+      const parsedBrand = cachedBrand ? JSON.parse(cachedBrand) : null;
+      if (parsedHeader || parsedBrand) {
+        setBrandConfig((prev: any) => ({
+          ...prev,
+          brandName: parsedHeader?.brandName || parsedBrand?.brandName || prev.brandName,
+          tagline: parsedBrand?.tagline || prev.tagline,
+          shortDescription: parsedBrand?.shortDescription || prev.shortDescription,
+          logoUrl: parsedHeader?.logoUrl || parsedBrand?.logoUrl || parsedBrand?.footerLogoUrl || prev.logoUrl,
+        }));
+      }
+    } catch (e) {}
+
+    // 2. Fetch fresh API data
     Promise.all([
       fetchApi('/cms/header').catch(() => null),
       fetchApi('/cms/brand').catch(() => null),

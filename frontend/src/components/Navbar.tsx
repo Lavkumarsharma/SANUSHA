@@ -97,22 +97,11 @@ export const Navbar: React.FC = () => {
   const totalCartCount = (cart || []).reduce((acc, item) => acc + (item.quantity || 1), 0);
   const totalWishlistCount = (wishlist || []).length;
 
-  // Header Config from Cache/API
-  const [headerConfig, setHeaderConfig] = useState<any>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('sanusha_cms_header_cache');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && parsed.brandName) return parsed;
-        }
-      } catch (e) {}
-    }
-    return {
-      brandName: 'SANUSHA',
-      iconUrl: '',
-      logoUrl: '',
-    };
+  // Header Config from Cache/API (Pure Static Initializer to prevent Hydration Mismatches)
+  const [headerConfig, setHeaderConfig] = useState<any>({
+    brandName: 'SANUSHA',
+    iconUrl: '',
+    logoUrl: '',
   });
 
   const [rotatingPlaceholders, setRotatingPlaceholders] = useState<string[]>(ROTATING_PLACEHOLDERS);
@@ -120,6 +109,16 @@ export const Navbar: React.FC = () => {
 
   // Load products, header, search & brand settings
   useEffect(() => {
+    // 1. Client-side localStorage hydration after initial render
+    try {
+      const cached = localStorage.getItem('sanusha_cms_header_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.brandName) setHeaderConfig(parsed);
+      }
+    } catch (e) {}
+
+    // 2. Fetch fresh API data
     Promise.all([
       fetchApi('/products').catch(() => FALLBACK_PRODUCTS),
       fetchApi('/cms/header').catch(() => null),
@@ -129,11 +128,9 @@ export const Navbar: React.FC = () => {
       if (prods && prods.length > 0) setAllProducts(prods);
       if (data && data.brandName) {
         setHeaderConfig(data);
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
-          } catch (e) {}
-        }
+        try {
+          localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+        } catch (e) {}
       } else if (brandData && brandData.brandName) {
         setHeaderConfig((prev: any) => ({ ...prev, ...brandData }));
       }

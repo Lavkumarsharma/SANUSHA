@@ -70,14 +70,17 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}, retr
     });
 
     if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`404 Not Found: ${endpoint}`);
+      }
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || `API Error: ${response.statusText}`);
     }
 
     return await response.json();
   } catch (err: any) {
-    if (retries > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (retries > 0 && !err.message?.includes('404')) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return fetchApi(endpoint, options, retries - 1);
     }
     throw err;
