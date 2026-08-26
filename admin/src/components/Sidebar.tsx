@@ -44,7 +44,9 @@ export const Sidebar: React.FC = () => {
         if (data && data.brandName) {
           setHeaderConfig(data);
           if (typeof window !== 'undefined') {
-            localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+            try {
+              localStorage.setItem('sanusha_cms_header_cache', JSON.stringify(data));
+            } catch (storageErr) {}
           }
         }
       })

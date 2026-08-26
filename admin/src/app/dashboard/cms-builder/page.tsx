@@ -559,7 +559,11 @@ export default function CMSPageBuilderPage() {
         body: JSON.stringify(heroSlides),
       });
       if (typeof window !== 'undefined') {
-        localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(heroSlides));
+        try {
+          localStorage.setItem('sanusha_cms_hero_cache', JSON.stringify(heroSlides));
+        } catch (storageErr) {
+          console.warn('LocalStorage quota exceeded for sanusha_cms_hero_cache:', storageErr);
+        }
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
